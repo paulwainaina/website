@@ -1,6 +1,8 @@
 {{template "header"}}
     <title>{{.Title}}</title>
     <link rel="icon" type="image/x-icon" href='{{printf "%s/assets/images/pcea-logo.png" .BackendUrl}}'>
+    <script src="https://kit.fontawesome.com/cee649f143.js" crossorigin="anonymous"></script>
+    <link href='{{printf "%s/assets/css/style.css" .BackendUrl}}' rel="stylesheet">
 {{template "navbarheader"}}
     <a class="navbar-brand" href="#page-top">
         <img src='{{printf "%s/assets/images/pcea-logo.png" .BackendUrl}}'  alt="pcea logo" height=50 width=50 style="object-fit: contain;">
@@ -63,7 +65,55 @@
             </div>
         </div>  
         <div id="history">
-            <h1>History</h1>
+            <div class="container">
+                <h2 class="pb-5 pt-5 text-center mb-5 display-5">Timeline</h2>
+                <div class="row align-items-center connecting-line d-flex">
+                    <div class="col-2 text-center bottom d-inline-flex justify-content-center align-items-center">
+                        <div class="circle font-weight-bold">2010</div>
+                    </div>
+                    <div class="col-6">
+                        <h4>first creation</h4>
+                        <p> this was first creation fgfdgfgfsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss</p>
+                    </div>
+                </div>
+                <div class="row timeline">
+                    <div class="col-2">
+                        <div class="corner top-right"></div>
+                    </div>
+                    <div class="col-8"></div>
+                    <div class="col-2">
+                        <div class="corner left-bottom">
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-center justify-content-end connecting-line d-flex">
+                    <div class="col-6 text-right">
+                        <h4>second creation</h4>
+                        <p> this was first creation </p>
+                    </div>
+                    <div class="col-2 text-center full d-inline-flex justify-content-center align-items-center">
+                        <div class="circle font-weight-bold">2020</div>
+                    </div>
+                </div>
+                <div class="row timeline">
+                    <div class="col-2">
+                        <div class="corner right-bottom"></div>
+                    </div>
+                    <div class="col-8"></div>
+                    <div class="col-2">
+                        <div class="corner top-left"></div>
+                    </div>
+                </div>
+                <div class="row align-items-center connecting-line d-flex">
+                    <div class="col-2 text-center top d-inline-flex justify-content-center align-items-center">
+                        <div class="circle font-weight-bold">2030</div>
+                    </div>
+                    <div class="col-6">
+                        <h4>third creation</h4>
+                        <p> this was first creation </p>
+                    </div>
+                </div>
+            </div>
         </div>      
         <div id="gallery">
             <h1>Gallery</h1>
@@ -78,10 +128,37 @@
         </div>   
     </div>
     <footer>
-        <div class="container" style="background-color: #014674; margin:auto">
-            <p>
-                Copyright PCEA Elijah Wathika Memorial Church - All Rights Reserved. Website by Haptic solutions
-            </p>
+        <div class="container" style="background-color: #014674;display:flex;justify-content: center;align-items: center;">
+            <div >
+                <div class="text-center  justify-content-center" style="color: white;margin-left: 25%;margin-right: 25%;margin-top: 10px;">
+                    Thank you for considering connecting with us! Don't miss out on our online Sunday service and the opportunity to engage with us on social media. 
+                    We value your input and look forward to hearing from you soon.                     
+                </div>                 
+                <div class="text-center p-3">
+                    <a href="https://www.youtube.com/@elijahwathikamemorialchurch" class="text-white me-5">
+                        <i class="fa-brands fa-youtube"></i> PCEA Elijah Wathika
+                    </a>
+                    <a href="" class="text-white me-5">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                    <a href="" class="text-white me-5">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="" class="text-white me-5">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="" class="text-white me-5">
+                        <i class="fa-brands fa-linkedin-in"></i>
+                    </a>
+                    <a href="" class="text-white me-5">
+                        <i class="fa-solid fa-phone"></i>
+                    </a>
+                </div>
+                <div class="text-center p-3" style="color: white;">
+                    Copyright &#169; PCEA Elijah Wathika Memorial Church - All Rights Reserved. Website by Haptic solutions
+                </div>
+            </div>
+          
         </div>
     </footer>
     </body>

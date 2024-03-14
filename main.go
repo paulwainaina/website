@@ -16,8 +16,12 @@ var (
 )
 
 func init() {
-	tmp = template.Must(template.ParseGlob("./template/*.html"))
-	err := godotenv.Load(".env")
+	t, err := template.ParseGlob("./template/*.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	tmp = template.Must(t, err)
+	err = godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading the .env file")
 	}
