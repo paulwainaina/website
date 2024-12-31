@@ -1,7 +1,45 @@
 {{define "body"}}
 </head>
     <body>
-        <nav class="navbar navbar-expanded-lg bg-body-secondary">
-
+        <nav class="navbar navbar-expand-lg bg-body-secondary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/home">
+                    <img src="https://localhost:4443/assets/favicon.png" alt="church logo" width="30" height="30" class="d-inline-block align-text-center" >
+                    PCEA Elijah Wathika Memorial Church
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mx-3" >
+                            <a class="nav-link" href="/home" id="home">Home</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link" href="/services" id="services">Services</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link" href="/events" id="events" >Events</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link" href="/contacts" id="contacts">Contacts</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </nav>
+        <script>
+            window.onload=function () {
+                document.querySelectorAll('.nav-link.active').forEach(function(link) {
+                    link.removeAttribute('aria-current');
+                    link.classList.remove('active')
+                });
+                var activeItem = document.getElementById(window.location.pathname.substring(1));
+                if (activeItem) {
+                    activeItem.setAttribute('aria-current', 'page');
+                    activeItem.classList.add('active')
+                    activeItem.parentElement.style.backgroundColor="grey"
+                }
+            }            
+        </script>
 {{end}} 

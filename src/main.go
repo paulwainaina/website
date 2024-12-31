@@ -10,8 +10,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-var(
-	tpl *template.Template
+var (
+	tpl    *template.Template
 	config *tls.Config
 )
 
@@ -42,19 +42,36 @@ func RenderTemplate(w http.ResponseWriter, file string, page *Page) {
 	}
 }
 
-func IndexHandler(w http.ResponseWriter,r *http.Request){
-	RenderTemplate(w,"index.html",&Page{Title: "Home",Data:nil})
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "index.html", &Page{Title: "Home", Data: nil})
+}
+
+func ServicesHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "services.html", &Page{Title: "Services", Data: nil})
+}
+
+func EventsHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "events.html", &Page{Title: "Events", Data: nil})
+}
+
+func ContactsHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "contacts.html", &Page{Title: "Contacts", Data: nil})
 }
 
 func main() {
-	router:=http.NewServeMux()
-	router.HandleFunc("/",IndexHandler)
+	router := http.NewServeMux()
+	router.HandleFunc("/home", IndexHandler)
+	router.HandleFunc("/services", ServicesHandler)
+	router.HandleFunc("/events", EventsHandler)
+	router.HandleFunc("/contacts", ContactsHandler)
+	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
+
 	server := &http.Server{
 		Addr:      os.Getenv("PORT"),
 		Handler:   router,
 		TLSConfig: config,
 	}
-	err:=server.ListenAndServeTLS("","")
+	err := server.ListenAndServeTLS("", "")
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
