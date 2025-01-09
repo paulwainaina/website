@@ -58,13 +58,23 @@ func ContactsHandler(w http.ResponseWriter, r *http.Request) {
 	RenderTemplate(w, "contacts.html", &Page{Title: "Contacts", Data: nil})
 }
 
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "login.html", &Page{Title: "Login", Data: nil})
+}
+
 func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/home", IndexHandler)
 	router.HandleFunc("/services", ServicesHandler)
 	router.HandleFunc("/events", EventsHandler)
 	router.HandleFunc("/contacts", ContactsHandler)
+	router.HandleFunc("/login", LoginHandler)
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
+
+	//Redirect unknown path to home
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/home", http.StatusFound)
+	})
 
 	server := &http.Server{
 		Addr:      os.Getenv("PORT"),

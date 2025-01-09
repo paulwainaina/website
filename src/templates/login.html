@@ -1,0 +1,64 @@
+{{template "header"}}
+    <title>{{.Title}}</title>
+{{template "body"}} 
+<div class="h-100 d-flex justify-content-center align-items-center  align-items-center">
+    <div class="card" style="width:50rem;margin:auto;">
+        <div class="card-body">
+            <form  class="needs-validation" id="loginform" novalidate style="margin:0 auto;">
+                <div class="text-center">
+                    <img class=" mt-4 mb-4" src="https://localhost:4443/assets/favicon.png" height="72">
+                </div>
+                <h1 class="text-center h3 mb-3">Welcome Back. Please Sign In</h1>
+                <div class="mb-3">
+                    <label for="useremail" class="sr-only" >Email address</label>
+                    <input type="email" class="form-control" id="useremail"  required autofocus>
+                    <div class="invalid-feedback">
+                        Please provide a valid email
+                    </div>             
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="userpassword" >Password</label>
+                    <input type="password" class="form-control" id="userpassword" pattern="(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required>
+                    <div class="invalid-feedback">
+                        <ul>
+                            <li>The password length must be greater than or equal to 8</li>
+                            <li>The password must contain one or more uppercase characters</li>
+                            <li>The password must contain one or more lowercase characters</li>
+                            <li>The password must contain one or more numeric values</li>
+                            <li>The password must contain one or more special characters</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <input type="checkbox" id="showpassword"> Show Password
+                </div>
+                <div class="row g-2"> 
+                    <div class="col-sm-3">
+                        <button  class="btn btn-primary" type="submit"  >Login</button>
+                    </div>
+                </div>
+                <br>
+                <div id="errorDiv" class="alter" role="alter">
+
+                </div>
+            </form> 
+        </div>
+    </div>
+</div> 
+<script>
+    //View/Hide password
+     document.getElementById("showpassword").addEventListener("click", function(event){
+            var x = document.getElementById("userpassword");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        })
+    //Login action
+    var form=document.getElementById("loginform")
+    form.addEventListener("submit", function(event){
+        
+    })
+</script>
+{{template "footer"}} 

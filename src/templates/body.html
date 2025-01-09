@@ -24,23 +24,61 @@
                         <li class="nav-item mx-3">
                             <a class="nav-link" href="/contacts" id="contacts">Contacts</a>
                         </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link sensitive" href="/members" id="members">Members</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link sensitive" href="/groups" id="groups">Groups</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link sensitive" href="/messages" id="messages">Messages</a>
+                        </li>
                     </ul>
                 </div>
+                <form class="d-flex" id="navlogin" >
+                    <button class="btn btn-outline-secondary" type="submit">Login</button>
+                  </form>
             </div>
         </nav>
-        <script>
+        <script> 
+            //Check is a session cookie has been set
+            function SessionExists(){
+                return sessionStorage.getItem("usersessionid") !== null;
+            }
+
+            //Open up the login page
+            document.getElementById('navlogin').addEventListener('submit',(event)=>{
+                event.preventDefault()
+                event.stopPropagation()
+                window.location.replace("https://localhost:4443/login");
+            });
+
+            //Initial function called once a page is loaded
             window.onload=function () {
+                //Highlight the active page
                 document.querySelectorAll('.nav-link.active').forEach(function(link) {
                     link.removeAttribute('aria-current');
-                    link.classList.remove('active')
+                    link.classList.remove('active');
                 });
                 var activeItem = document.getElementById(window.location.pathname.substring(1));
                 if (activeItem) {
                     activeItem.setAttribute('aria-current', 'page');
-                    activeItem.classList.add('active')
-                    activeItem.parentElement.style.backgroundColor="grey"
+                    activeItem.classList.add('active');
+                    activeItem.parentElement.style.backgroundColor="grey";
                 }
-            }            
+                //if session does not exist deactivate some pages
+                if (!SessionExists()){
+                    document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
+                    link.setAttribute('aria-disabled', 'true')
+                    link.classList.add('disabled');
+                });
+                }else{
+                    document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
+                    link.removeAttribute('aria-disabled')
+                    link.classList.remove('disabled');
+                })}
+
+            };                        
         </script>
         <div class="flex-grow-1">   
 {{end}} 
