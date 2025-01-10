@@ -35,23 +35,39 @@
                         </li>
                     </ul>
                 </div>
-                <form class="d-flex" id="navlogin" >
-                    <button class="btn btn-outline-secondary" type="submit">Login</button>
+                <form class="d-flex" >
+                    <button class="btn btn-outline-secondary" type="button" onclick="openloginpagefunc();" id="openloginpage">Login</button>
+                    <button class="btn btn-outline-danger" type="button" onclick="logoutsessionfunc();" id="logoutsession">Logout</button>
                   </form>
             </div>
         </nav>
         <script> 
-            //Check is a session cookie has been set
+            //Delete cookie
+            function deletecookie(name) {
+                /*const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].split("=")[0];
+                    document.cookie = cookie + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+                }*/
+                document.cookie =name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+            }
+             //Check is a session cookie has been set
             function SessionExists(){
-                return sessionStorage.getItem("usersessionid") !== null;
+                return document.cookie.split(';').some((item) => item.trim().startsWith('usersessionid='))
             }
 
+            //Get cookie value
+            //const cookieValue= document.cookie.split("; ") .find((row) => row.startsWith("usersessionid="))?.split("=")[1];
+
             //Open up the login page
-            document.getElementById('navlogin').addEventListener('submit',(event)=>{
-                event.preventDefault()
-                event.stopPropagation()
+            function openloginpagefunc(){            
                 window.location.replace("https://localhost:4443/login");
-            });
+            }
+
+            function logoutsessionfunc(){
+                deletecookie("usersessionid");
+                window.location.replace("https://localhost:4443/");
+            }
 
             //Initial function called once a page is loaded
             window.onload=function () {
@@ -71,11 +87,15 @@
                     document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
                     link.setAttribute('aria-disabled', 'true')
                     link.classList.add('disabled');
+                    document.getElementById("openloginpage").style.display='block'
+                    document.getElementById("logoutsession").style.display='none'
                 });
                 }else{
                     document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
                     link.removeAttribute('aria-disabled')
                     link.classList.remove('disabled');
+                    document.getElementById("openloginpage").style.display='none'
+                    document.getElementById("logoutsession").style.display='block'
                 })}
 
             };                        
