@@ -58,7 +58,41 @@
     //Login action
     var form=document.getElementById("loginform")
     form.addEventListener("submit", function(event){
-        document.cookie="usersessionid=1"
+        event.preventDefault()
+        event.stopPropagation()
+        form.classList.add('was-validated') 
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"username":form.useremail.value,"userpassword":form.userpassword.value})
+                fetch('https://localhost:8080/login',{ method:'POST',headers:{'Content-Type':'application/json'},body: data}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alter-danger")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alter-success")
+                            y.innerHTML="Correct credentials"
+                            window.location.replace("https://localhost:4443/home")                            
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alter-danger")
+                    y.innerHTML=e
+                    form.classList.remove('was-validated')
+                })            
+                setTimeout(()=>{ 
+                    y.className="alter"
+                    y.innerHTML=""
+                },10000)
+        }
     })
 </script>
 {{template "footer"}} 

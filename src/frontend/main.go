@@ -21,7 +21,7 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 	tpl = template.Must(template.ParseGlob("./templates/*.html"))
-	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	cert, err := tls.LoadX509KeyPair("../server.crt", "../server.key")
 	if err != nil {
 		log.Fatalf("Failed to load X509 key pair: %v", err)
 	}
