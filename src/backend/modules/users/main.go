@@ -1,15 +1,12 @@
 package users
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/astaxie/beego/session"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -34,7 +31,7 @@ type Users struct {
 
 func NewUsers(db *mongo.Database, globalSessions *session.Manager) *Users {
 	users := make([]*User, 0)
-	col := db.Collection(userCollection)
+	/*col := db.Collection(userCollection)
 	result, err := col.Find(context.TODO(), bson.M{})
 	if err != nil {
 		log.Fatal(err.Error())
@@ -42,7 +39,7 @@ func NewUsers(db *mongo.Database, globalSessions *session.Manager) *Users {
 		if err = result.All(context.TODO(), &users); err != nil {
 			log.Fatal("Error loading users data " + err.Error())
 		}
-	}
+	}*/
 	return &Users{users: users, globalSessions: globalSessions, db: db}
 }
 
