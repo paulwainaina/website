@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	tpl    *template.Template
-	config *tls.Config
+	tpl       *template.Template
+	tlsConfig *tls.Config
 )
 
 func init() {
@@ -21,12 +21,12 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 	tpl = template.Must(template.ParseGlob("./templates/*.html"))
-	cert, err := tls.LoadX509KeyPair("../server.crt", "../server.key")
+	certificate, err := tls.LoadX509KeyPair("../certificate/cert.pem", "../certificate/key.pem")
 	if err != nil {
-		log.Fatalf("Failed to load X509 key pair: %v", err)
+		log.Fatalf("failed to load server certificates: %v", err)
 	}
-	config = &tls.Config{
-		Certificates: []tls.Certificate{cert},
+	tlsConfig = &tls.Config{
+		Certificates: []tls.Certificate{certificate},
 	}
 }
 
@@ -79,7 +79,7 @@ func main() {
 	server := &http.Server{
 		Addr:      os.Getenv("PORT"),
 		Handler:   router,
-		TLSConfig: config,
+		TLSConfig: tlsConfig,
 	}
 	err := server.ListenAndServeTLS("", "")
 	if err != nil {
