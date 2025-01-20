@@ -61,8 +61,21 @@ func ContactsHandler(w http.ResponseWriter, r *http.Request) {
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	RenderTemplate(w, "login.html", &Page{Title: "Login", Data: nil})
 }
+
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	RenderTemplate(w, "register.html", &Page{Title: "Login", Data: nil})
+}
+
+func MembersHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "members.html", &Page{Title: "Members", Data: nil})
+}
+
+func GroupsHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "groups.html", &Page{Title: "Groups", Data: nil})
+}
+
+func DistrictsHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "districts.html", &Page{Title: "Districts", Data: nil})
 }
 
 func main() {
@@ -73,6 +86,9 @@ func main() {
 	router.HandleFunc("/contacts", ContactsHandler)
 	router.HandleFunc("/login", LoginHandler)
 	router.HandleFunc("/signup", SignupHandler)
+	router.HandleFunc("/members", MembersHandler)
+	router.HandleFunc("/groups", GroupsHandler)
+	router.HandleFunc("/districts", DistrictsHandler)
 	router.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets"))))
 
 	//Redirect unknown path to home

@@ -3,6 +3,9 @@ module example.com/website_backend
 go 1.21.3
 
 require (
+	example.com/districts v0.0.0-00010101000000-000000000000
+	example.com/groups v0.0.0-00010101000000-000000000000
+	example.com/members v0.0.0-00010101000000-000000000000
 	example.com/users v0.0.0-00010101000000-000000000000
 	github.com/astaxie/beego v1.12.3
 	github.com/joho/godotenv v1.5.1
@@ -23,4 +26,9 @@ require (
 	golang.org/x/sync v0.10.0 // indirect; indirect1000000-000000000000
 )
 
-replace example.com/users => ./modules/users
+replace (
+	example.com/districts => ./modules/districts
+	example.com/groups => ./modules/groups
+	example.com/members => ./modules/members
+	example.com/users => ./modules/users
+)

@@ -8,6 +8,9 @@ import (
 	"os"
 	"strings"
 
+	"example.com/districts"
+	"example.com/groups"
+	"example.com/members"
 	"example.com/users"
 	"github.com/astaxie/beego/session"
 	"github.com/joho/godotenv"
@@ -66,18 +69,28 @@ func middleware(next http.Handler) http.Handler {
 func main() {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv("Mongo_Connect")))
 	if err != nil {
-		//log.Fatal(err)
+		log.Fatal(err)
 	}
 	defer client.Disconnect(context.TODO())
 	db := client.Database(os.Getenv("Database"))
 	_, err = db.ListCollectionNames(context.TODO(), bson.D{})
 	if err != nil {
-		//log.Fatal(err)
+		log.Fatal(err)
 	}
-	u := users.NewUsers(nil, globalSessions)
+	u := users.NewUsers(db, globalSessions)
 	router := http.NewServeMux()
 	router.Handle("/login", middleware(http.HandlerFunc(u.ServeHTTP)))
 	router.Handle("/logout", middleware(http.HandlerFunc(u.ServeHTTP)))
+	router.Handle("/user", middleware(http.HandlerFunc(u.ServeHTTP)))
+
+	m := members.NewMembers(db)
+	router.Handle("/member", middleware(http.HandlerFunc(m.ServeHTTP)))
+
+	g := groups.NewGroups(db)
+	router.Handle("/group", middleware(http.HandlerFunc(g.ServeHTTP)))
+
+	d := districts.NewDistricts(db)
+	router.Handle("/district", middleware(http.HandlerFunc(d.ServeHTTP)))
 
 	server := &http.Server{
 		Addr:      os.Getenv("PORT"),

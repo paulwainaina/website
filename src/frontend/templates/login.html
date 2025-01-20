@@ -59,7 +59,7 @@
         form.classList.add('was-validated') 
         if (form.checkValidity()){
             var y=document.getElementById('errorDiv')
-                var data=JSON.stringify({"Name":form.useremail.value,"Password":form.userpassword.value})
+                var data=JSON.stringify({"NameEmail":form.useremail.value,"Password":form.userpassword.value})
                 fetch('https://localhost:8080/login',{ method:'POST',headers:{'Content-Type':'application/json'},body: data,credentials:"include",mode:"cors"}).then(
                     (result)=>{                    
                         if (!result.ok){                    

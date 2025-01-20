@@ -108,46 +108,46 @@ func (users *Users) delete(usr *User) (*User, error) {
 	return nil, fmt.Errorf("user account does not exists")
 }
 
-func (users *Users) update(update map [string]interface{}) (*User,error){ 
+func (users *Users) update(update map[string]interface{}) (*User, error) {
 	var usr User
 	var fields []string
-	rv:=reflect.ValueOf(usr)
-	for key,value:=range update{
-		field:=rv.FieldByName(key)
-		if field.IsValid() && field.CanSet(){
-			val:=reflect.ValueOf(value)
-			if field.Type()==val.Type(){
+	rv := reflect.ValueOf(usr)
+	for key, value := range update {
+		field := rv.FieldByName(key)
+		if field.IsValid() && field.CanSet() {
+			val := reflect.ValueOf(value)
+			if field.Type() == val.Type() {
 				field.Set(val)
-			}else{
-				return nil ,fmt.Errorf("update field with type mismatch %v " ,key)
+			} else {
+				return nil, fmt.Errorf("update field with type mismatch %v ", key)
 			}
-			fields=append(fields, key)
+			fields = append(fields, key)
 		}
 	}
-	req:=0
-	for i,v:=range fields{
-		if strings.EqualFold(v,"id")||strings.EqualFold(v,"email"){
-			req+=1
+	req := 0
+	for i, v := range fields {
+		if strings.EqualFold(v, "Id") || strings.EqualFold(v, "Email") {
+			req += 1
 		}
-		if i==len(fields)-1 && req!=2{
-			return nil ,fmt.Errorf("update missing important fields")
+		if i == len(fields)-1 && req != 2 {
+			return nil, fmt.Errorf("update missing important fields")
 		}
 	}
 	for _, user := range users.users {
-		if strings.EqualFold(user.Email,usr.Email) && strings.EqualFold(user.Id, usr.Id) {
-			if usr.Password !=""{
+		if strings.EqualFold(user.Email, usr.Email) && strings.EqualFold(user.Id, usr.Id) {
+			if usr.Password != "" {
 				hash, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 10)
 				if err != nil {
 					return nil, fmt.Errorf("error processing user password")
 				}
-				usr.Password=string(hash)
+				usr.Password = string(hash)
 			}
 			col := users.db.Collection(userCollection)
-			_, err := col.UpdateByID(context.TODO(),usr.Id,usr )
+			_, err := col.UpdateByID(context.TODO(), usr.Id, usr)
 			if err != nil {
 				return nil, fmt.Errorf("error updating user")
 			}
-			return &usr,nil
+			return &usr, nil
 		}
 	}
 	return nil, fmt.Errorf("user account does not exists")
@@ -156,15 +156,15 @@ func (users *Users) update(update map [string]interface{}) (*User,error){
 func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.EqualFold(r.URL.Path, "/login") {
 		var credentials struct {
-			Name     string
-			Password string
+			NameEmail string
+			Password  string
 		}
 		err := json.NewDecoder(r.Body).Decode(&credentials)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		user, err := users.login(credentials.Name, credentials.Password)
+		user, err := users.login(credentials.NameEmail, credentials.Password)
 		if err != nil {
 			res := struct{ Error string }{Error: err.Error()}
 			json.NewEncoder(w).Encode(res)
@@ -223,6 +223,23 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				json.NewEncoder(w).Encode(u)
 				return
+			}
+		case http.MethodPut:
+			{
+				updateUser := make(map[string]interface{}, 0)
+				err := json.NewDecoder(r.Body).Decode(&updateUser)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
+				u, err := users.update(updateUser)
+				if err != nil {
+					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))
+					return
+				}
+				json.NewEncoder(w).Encode(u)
+				return
+
 			}
 
 		}
