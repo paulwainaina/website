@@ -11,6 +11,7 @@ import (
 	"example.com/districts"
 	"example.com/groups"
 	"example.com/members"
+	"example.com/messages"
 	"example.com/users"
 	"github.com/astaxie/beego/session"
 	"github.com/joho/godotenv"
@@ -91,6 +92,9 @@ func main() {
 
 	d := districts.NewDistricts(db)
 	router.Handle("/district", middleware(http.HandlerFunc(d.ServeHTTP)))
+
+	mes := messages.NewMessages(db)
+	router.Handle("/message", middleware(http.HandlerFunc(mes.ServeHTTP)))
 
 	server := &http.Server{
 		Addr:      os.Getenv("PORT"),
