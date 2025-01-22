@@ -60,7 +60,7 @@
         if (form.checkValidity()){
             var y=document.getElementById('errorDiv')
                 var data=JSON.stringify({"NameEmail":form.useremail.value,"Password":form.userpassword.value})
-                fetch('https://localhost:8080/login',{ method:'POST',headers:{'Content-Type':'application/json'},body: data,credentials:"include",mode:"cors"}).then(
+                fetch('https://localhost:8080/login',{ method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
                     (result)=>{                    
                         if (!result.ok){                    
                             throw new Error(JSON.stringify(result.body));

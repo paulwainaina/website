@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 
@@ -61,13 +62,13 @@ func (users *Users) login(username, userpassword string) (*User, error) {
 	return nil, fmt.Errorf("account does not exist")
 }
 
-func (users *Users) register(usr *User) (*User, error) {
+func (users *Users) Register(usr *User) (*User, error) {
 	for _, user := range users.users {
 		if strings.EqualFold(user.Email, usr.Email) {
 			return nil, fmt.Errorf("user account already exists")
 		}
 	}
-	hash, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 10)
+	hash, err := bcrypt.GenerateFromPassword([]byte(usr.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("error processing user password")
 	}
@@ -136,7 +137,7 @@ func (users *Users) update(update map[string]interface{}) (*User, error) {
 	for _, user := range users.users {
 		if strings.EqualFold(user.Email, usr.Email) && strings.EqualFold(user.Id, usr.Id) {
 			if usr.Password != "" {
-				hash, err := bcrypt.GenerateFromPassword([]byte(usr.Password), 10)
+				hash, err := bcrypt.GenerateFromPassword([]byte(usr.Password), bcrypt.DefaultCost)
 				if err != nil {
 					return nil, fmt.Errorf("error processing user password")
 				}
@@ -177,6 +178,7 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		defer sess.SessionRelease(w)
 		sess.Set("useremail", user.Email)
+		http.SetCookie(w, &http.Cookie{Name: os.Getenv("Session_Cookie"), Value: sess.SessionID(), Path: "/", HttpOnly: false, Secure: true})
 		json.NewEncoder(w).Encode(user)
 		return
 	} else if strings.EqualFold(r.URL.Path, "/logout") {
@@ -191,7 +193,7 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				u, err := users.register(&newUser)
+				u, err := users.Register(&newUser)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))
 					return

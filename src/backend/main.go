@@ -35,12 +35,13 @@ func init() {
 		log.Fatalf("Failed to create session manager")
 	}
 	go globalSessions.GC()
-	certificate, err := tls.LoadX509KeyPair("../certificate/cert.pem", "../certificate/key.pem")
+	certificate, err := tls.LoadX509KeyPair("./certificate/cert.pem", "./certificate/key.pem")
 	if err != nil {
 		log.Fatalf("failed to load server certificates: %v", err)
 	}
 	tlsConfig = &tls.Config{
-		Certificates: []tls.Certificate{certificate},
+		Certificates:       []tls.Certificate{certificate},
+		InsecureSkipVerify: true,
 	}
 }
 
@@ -56,8 +57,12 @@ func middleware(next http.Handler) http.Handler {
 			return
 		}
 		if !strings.EqualFold(r.URL.Path, "/login") {
-			_, err := r.Cookie(os.Getenv("Session_Cookie"))
+			c, err := r.Cookie(os.Getenv("Session_Cookie"))
 			if err != nil {
+				w.WriteHeader(http.StatusForbidden)
+				return
+			}
+			if !globalSessions.GetProvider().SessionExist(c.Value) {
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
@@ -74,11 +79,27 @@ func main() {
 	}
 	defer client.Disconnect(context.TODO())
 	db := client.Database(os.Getenv("Database"))
-	_, err = db.ListCollectionNames(context.TODO(), bson.D{})
+	names, err := db.ListCollectionNames(context.TODO(), bson.D{})
 	if err != nil {
 		log.Fatal(err)
 	}
 	u := users.NewUsers(db, globalSessions)
+	exists := false
+	for _, name := range names {
+		if name == "user" {
+			exists = true
+		}
+	}
+
+	if !exists {
+		db.CreateCollection(context.TODO(), "user")
+		user := users.User{Email: os.Getenv("DefaultEmail"), Password: os.Getenv("DefaultPassword"), Active: true}
+		_, err = u.Register(&user)
+		if err != nil {
+			log.Fatal("Error initializing default users")
+		}
+	}
+
 	router := http.NewServeMux()
 	router.Handle("/login", middleware(http.HandlerFunc(u.ServeHTTP)))
 	router.Handle("/logout", middleware(http.HandlerFunc(u.ServeHTTP)))

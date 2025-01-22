@@ -1,0 +1,41 @@
+services:
+  backend:
+    container_name: backend
+    restart: always
+    build: ./src/backend
+    user: "backend:backend"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database 
+    networks:
+      - website         
+  database:
+    container_name: database
+    image: mongo:latest
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - website
+    volumes:
+      - ./database:/data/db
+  frontend:
+    container_name: frontend
+    restart: always
+    build: ./src/frontend 
+    user: "frontend:frontend"
+    ports:
+      - "4443:4443"
+    depends_on:
+      - backend 
+    networks:
+      - website
+    volumes:
+      - ./assets:/home/moses/Documents/website/src/frontend/assets
+networks:
+  website:
+    driver: bridge
+volumes:
+  database:
+  assets:

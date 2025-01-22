@@ -21,12 +21,13 @@ func init() {
 		log.Fatal("Error loading .env file")
 	}
 	tpl = template.Must(template.ParseGlob("./templates/*.html"))
-	certificate, err := tls.LoadX509KeyPair("../certificate/cert.pem", "../certificate/key.pem")
+	certificate, err := tls.LoadX509KeyPair("./certificate/cert.pem", "./certificate/key.pem")
 	if err != nil {
 		log.Fatalf("failed to load server certificates: %v", err)
 	}
 	tlsConfig = &tls.Config{
-		Certificates: []tls.Certificate{certificate},
+		Certificates:       []tls.Certificate{certificate},
+		InsecureSkipVerify: true,
 	}
 }
 
