@@ -1,0 +1,50 @@
+{{template "header"}}
+    <title>{{.Title}}</title>
+{{template "body"}} 
+<div id="errorDiv" class="alter" role="alter">
+
+</div>
+<script>
+    var districts=[]
+    var y=document.getElementById('errorDiv')
+
+    fetch('https://localhost:8080/districts',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+        (result)=>{                    
+            if (!result.ok){                    
+                throw new Error(JSON.stringify(result.body));
+            }
+            return result.json();
+        }).then((data)=>{
+            if(data.hasOwnProperty('Error')){
+                y.classList.add("alter-danger")
+                y.innerHTML=data['Error']
+                form.classList.remove('was-validated')
+            }else{
+                y.classList.add("alter-success")
+                y.innerHTML="Districts data fetched" 
+                districts=data.districts  
+            }    
+        }).catch((e)=>{
+            y.classList.add("alter-danger")
+            y.innerHTML=e
+            form.classList.remove('was-validated')
+    })
+    
+    const observer = new MutationObserver(function(mutationsList) {
+    mutationsList.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        setTimeout(()=>{
+                    y.className="alter"
+                    y.innerHTML=""
+                },10000)
+      }
+    });
+    
+    observer.observe(y,{attributes:true,childList:true,characterData:true})
+  });
+
+</script>
+
+
+
+{{template "footer"}} 

@@ -7,7 +7,7 @@
                
             </div>
             <div class="col">
-                    <form class="card p-5 border-secondary">
+                    <form class="card p-5 border-secondary" id="messageform">
                         <div class="card-body">
                             <h5 class="card-title">Get in Touch</h5>
                             <h6 class="card-subtitle mb-2 text-body-secondary">Use this contact form to share feedback and get answers</h6>
@@ -23,7 +23,10 @@
                                 <button type="submit" class="btn btn-primary mb-3">Submit</button>
                             </div>
                         </div>
-                       
+                        <br>
+                        <div id="errorDiv" class="alter" role="alter">
+        
+                        </div>
                     </form>
             </div>
         </div>
@@ -31,4 +34,43 @@
     </iframe>
    
 </div>
+<script>
+     var form=document.getElementById("messageform")
+    form.addEventListener("submit", function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        form.classList.add('was-validated') 
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Email":form.exampleInputEmail1.value,"Description":form.exampleInputTextArea1.value})
+                fetch('https://localhost:8080/message',{ method:'POST',headers:{'Content-Type':'application/json'},body: data,credentials:"include",mode:"cors"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alter-danger")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alter-success")
+                            y.innerHTML="Message sent"                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alter-danger")
+                    y.innerHTML=e
+                    form.classList.remove('was-validated')
+                })            
+                setTimeout(()=>{ 
+                    y.className="alter"
+                    y.innerHTML=""
+                },10000)
+        }
+    })
+</script>
 {{template "footer"}} 

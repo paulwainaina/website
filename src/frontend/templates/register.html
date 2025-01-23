@@ -4,11 +4,18 @@
 <div class="h-100 d-flex justify-content-center align-items-center  align-items-center">
     <div class="card" style="width:50rem;margin:auto;">
         <div class="card-body">
-            <form  class="needs-validation" id="loginform" novalidate style="margin:0 auto;">
+            <form  class="needs-validation" id="registerform" novalidate style="margin:0 auto;">
                 <div class="text-center">
                     <img class=" mt-4 mb-4" src="https://localhost:4443/assets/favicon.png" height="72">
                 </div>
-                <h1 class="text-center h3 mb-3">Welcome Back. Sign in</h1>
+                <h1 class="text-center h3 mb-3">Create Account. Sign up</h1>
+                <div class="mb-3">
+                    <label for="username" class="sr-only" >User name</label>
+                    <input type="text" class="form-control" id="username"  required autofocus>
+                    <div class="invalid-feedback">
+                        Please provide a user name
+                    </div>             
+                </div>
                 <div class="mb-3">
                     <label for="useremail" class="sr-only" >Email address</label>
                     <input type="email" class="form-control" id="useremail"  required autofocus>
@@ -19,7 +26,7 @@
                 <div class="mb-3">
                     <label class="form-label" for="userpassword" >Password</label>
                     <input type="password" class="form-control" id="userpassword" pattern="(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required>
-                    <div class="invalid-feedback">
+                    <div class="invalid-feedback ">
                         <ul>
                             <li>The password length must be greater than or equal to 8</li>
                             <li>The password must contain one or more uppercase characters</li>
@@ -29,38 +36,50 @@
                         </ul>
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label" for="confirmpassword" >Confirm password</label>
+                    <input type="password" class="form-control" id="confirmpassword" pattern="(?=^.{8,}$)(?=.*\d)(?=.*[!@#$%^&*]+)(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required>
+                    <div class="invalid-feedback p">
+                        <p>The passwords do not match</p>
+                    </div>
+                </div>
                 <div class="d-flex mt-5"> 
-                    <div class="p-2">
-                        <button  class="btn btn-primary" type="submit"  >Log in</button>
+                    <div class="col-sm-3">
+                        <button  class="btn btn-primary" type="submit"  >Sign up</button>
                     </div>
                     <div class="ms-auto p-2">
-                        <p> Create an account <button  class="btn btn-link" type="button" onclick="opensignuppagefunc();"  >Sign up</button></p>
+                        <p> Already have an account?  <button  class="btn btn-link" type="button" onclick="openloginpagefunc();"  >Log in</button></p>
                         
                     </div>
                 </div>
                 <br>
                 <div id="errorDiv" class="alter" role="alter">
-
                 </div>
-            </form> 
+            </form>
         </div>
     </div>
-</div> 
+</div>
 <script>
     //Open up the signup page
-    function opensignuppagefunc(){            
-        window.location.replace("https://localhost:4443/signup");
+    function openloginpagefunc(){            
+        window.location.replace("https://localhost:4443/login");
     }
-    //Login action
-    var form=document.getElementById("loginform")
-    form.addEventListener("submit", function(event){
+    var form=document.getElementById("registerform")
+    form.addEventListener("submit", function(event){       
         event.preventDefault()
         event.stopPropagation()
+        var password = document.getElementById('userpassword');
+        var confirmPassword = document.getElementById('confirmpassword');
+        if (password.value !== confirmPassword.value) {   
+            confirmPassword.classList.add("is-invalid")
+        } else{   
+            confirmPassword.classList.add("is-valid")
+        } 
         form.classList.add('was-validated') 
         if (form.checkValidity()){
             var y=document.getElementById('errorDiv')
-                var data=JSON.stringify({"NameEmail":form.useremail.value,"Password":form.userpassword.value})
-                fetch('https://localhost:8080/login',{ method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Password":form.userpassword.value})
+                fetch('https://localhost:8080/register',{ method:'POST',headers:{'Content-Type':'application/json'},body: data,credentials:"include",mode:"cors"}).then(
                     (result)=>{                    
                         if (!result.ok){                    
                             throw new Error(JSON.stringify(result.body));
@@ -76,7 +95,7 @@
                         }else{
                             y.classList.add("alter-success")
                             y.innerHTML="Correct credentials"
-                            window.location.replace("https://localhost:4443/home")                            
+                            window.location.replace("https://localhost:4443/login")                            
                         }
                     }
                 ).catch((e)=>{
@@ -89,6 +108,7 @@
                     y.innerHTML=""
                 },10000)
         }
-    })
+    },false)
+    
 </script>
 {{template "footer"}} 
