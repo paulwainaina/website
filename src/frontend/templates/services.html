@@ -1,5 +1,76 @@
 {{template "header"}}
     <title>{{.Title}}</title>
+    <style>
+   
+        .container {
+            max-width: 800px; 
+            margin: 0 auto; 
+            margin-bottom: 20px;
+            padding: 20px; 
+            border: 4px solid transparent; 
+            border-radius: 15px; 
+            background: linear-gradient(rgb(250, 249, 249), white) padding-box, 
+                        linear-gradient(135deg, #3d027c, #2575fc) border-box; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+
+        .container:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); 
+            transform: translateX(2px); 
+            transition: all 0.3s ease;
+            background-color: #e0e0e0; 
+        }
+
+        h2 {
+            font-size: 2rem; 
+            color: #333333; 
+            margin-bottom: 15px; 
+        }
+
+
+        p {
+            font-size: 1rem; 
+            color: #555555; 
+            line-height: 1.6; 
+        }
+
+        
+        #logo {
+            text-align: center;
+            margin-top: 20px; 
+        }
+
+        #logo img {
+            max-width: 100%; 
+            height: auto; 
+            object-fit: contain; 
+         
+        }
+    </style>
 {{template "body"}} 
+<main>
+    <div class="container">
+        <section id="youth-service">
+            <h2>Youth Service</h2>
+            <p>Welcome to our Youth Service Join us for exciting activities and programs designed for young people.</p>
+        </section>
+
+        <div id="logo">
+            <img src="https://localhost:4443/assets/logo.jpg" class="d-block" alt="Company Logo">
+        </div>
+    </div>
+    <div class="container">
+        <section id="youth-service">
+            <h2>Kikuyu Service</h2>
+            <p>Welcome to our Kikuyu Service. This is the main service which is streamed live on Youtube. </p>
+        </section>
+
+        <div id="logo">
+            <iframe width="640" height="360" src="https://www.youtube.com/embed/Mzaqw8rmiQ4" title="PCEA KAHUNIRA PARISH SINGING GAME  2023/08/26" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+
+        <a class="btn btn-primary" href="https://www.youtube.com/@elijahwathikamemorialchurch" role="button">YouTube Link</a>
+    </div>
+</main>
+
 
 {{template "footer"}} 
