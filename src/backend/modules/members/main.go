@@ -153,7 +153,11 @@ func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					json.NewEncoder(w).Encode("{error: no users found}")
 					return
 				}
-				json.NewEncoder(w).Encode(fmt.Sprintf("{members: %v}", members.members))
+				result := make([]Member, 0)
+				for _, m := range members.members {
+					result = append(result, *m)
+				}
+				json.NewEncoder(w).Encode(fmt.Sprintf("{members: %v}", result))
 				return
 			}
 		case http.MethodDelete:
