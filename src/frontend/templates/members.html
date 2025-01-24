@@ -1,5 +1,114 @@
 {{template "header"}}
     <title>{{.Title}}</title>
+    <script>
+    var members = [];
+    fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+    (result)=>{                    
+            if (!result.ok){                    
+                throw new Error(JSON.stringify(result.body));
+            }
+            return result.json();
+    }).then((data)=>{
+                members=data.members    
+    }).catch((e)=>{})
+
+</script>
 {{template "body"}} 
 
+<div class="container mt-3">
+    <div class="d-flex justify-content-around">
+        <div >
+            <div class="card" style="width:18rem">
+                <div class="card-body">
+                    <h4 class="card-title">Members</h4>
+                    <h1 id="numberofmembers" class="card-text"> </h1>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaladd">
+                <i class="bi bi-plus"></i>Add Member
+            </button> 
+        </div>
+    </div>
+    <div>
+
+    </div>
+</div>
+<div class="modal fade" id="modaladd" tabindex="-1" aria-labelledby="modallabel" aria-hidden="true" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modallabel">Register New Member</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation" id="registerform" novalidate style="margin:0 auto;">
+                    <div class="mb-3">
+                        <label for="username" class="sr-only" >Member Name</label>
+                        <input type="text" class="form-control" id="username"  required autofocus>
+                        <div class="invalid-feedback">
+                            Enter the members name
+                        </div>             
+                    </div>
+                    <div class="mb-3">
+                        <label for="useremail" class="sr-only" >Email address</label>
+                        <input type="email" class="form-control" id="useremail"  required autofocus>
+                        <div class="invalid-feedback">
+                            Please provide a valid email
+                        </div>             
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>                                   
+                </form>
+                <div id="errorDiv" class="alter" role="alter"> </div>
+            </div>
+            <div class="modal-footer">                  
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>                
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("numberofmembers").innerHTML=members.length
+    
+
+    var form=document.getElementById("registerform")
+    form.addEventListener("submit", function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        form.classList.add('was-validated') 
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value})
+                fetch('https://localhost:8080/member',{ method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alter-danger")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alter-success")
+                            y.innerHTML="Districts data fetched"  
+                            //members.push(JSON.stringify(data))                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alter-danger")
+                    y.innerHTML=e
+                    form.classList.remove('was-validated')
+                })            
+                setTimeout(()=>{ 
+                    y.className="alter"
+                    y.innerHTML=""
+                },10000)
+        }
+    })
+</script>
 {{template "footer"}} 
