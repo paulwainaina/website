@@ -16,7 +16,7 @@
             </div>
         </div>
         <div>
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaladd">
+            <button type="button" class="btn btn-success" onclick="loaddata(null)" ><!-- data-bs-toggle="modal" data-bs-target="#modaladd" !-->
                 <i class="bi bi-plus"></i>Add Member
             </button> 
         </div>
@@ -70,8 +70,19 @@
     </div>
 </div>
 <script>
-
     var searchform=document.getElementById("searchform")
+    var form=document.getElementById("registerform")
+    function loadmodal(data){
+        let myModal = new bootstrap.Modal(document.getElementById('modaladd'), {})      
+        if (data!='undefined' && data){           
+           const found=members.find((element)=> element.Id==data)       
+           form.username.value=found.Name
+           form.useremail.value=found.Email
+        }   
+        myModal.show()
+    }
+
+   
     searchform.addEventListener("submit", function(event){
         event.preventDefault()
         event.stopPropagation()
@@ -85,6 +96,7 @@
         data.forEach(element => {
             const column=document.createElement("div")
             column.classList.add("col")
+            column.setAttribute("data-id",element.Id)
             const card=document.createElement("div")
             card.classList.add("card" ,"h-100")
             card.style.maxWidth="18rem"
@@ -104,6 +116,9 @@
             card.appendChild(cardbody)
             card.appendChild(cardimage)
             column.appendChild(card)
+            column.addEventListener("click",(e)=>{
+                loadmodal(element.Id)
+            })
             groupcard.appendChild(column)
         });
     }
@@ -121,7 +136,7 @@
         }).catch((e)=>{
     })
 
-    var form=document.getElementById("registerform")
+   
     form.addEventListener("submit", function(event){
         event.preventDefault()
         event.stopPropagation()
