@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego/session"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
@@ -193,6 +194,7 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				newUser.Id=uuid.NewString()
 				u, err := users.Register(&newUser)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))

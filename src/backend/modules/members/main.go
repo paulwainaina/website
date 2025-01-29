@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -139,6 +140,7 @@ func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				newmember.Id=uuid.NewString()
 				u, err := members.add(&newmember)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))
@@ -157,7 +159,7 @@ func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				for _, m := range members.members {
 					result = append(result, *m)
 				}
-				json.NewEncoder(w).Encode(fmt.Sprintf("{members: %v}", result))
+				json.NewEncoder(w).Encode(result)
 				return
 			}
 		case http.MethodDelete:

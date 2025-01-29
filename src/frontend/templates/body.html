@@ -71,9 +71,7 @@
              
             }
 
-            //Initial function called once a page is loaded
-            window.onload=function () {
-                //Highlight the active page
+            function loadcompleted(){
                 document.querySelectorAll('.nav-link.active').forEach(function(link) {
                     link.removeAttribute('aria-current');
                     link.classList.remove('active');
@@ -99,8 +97,7 @@
                     document.getElementById("openloginpage").style.display='none'
                     document.getElementById("logoutsession").style.display='block'
                 })}
-
-            };                        
+            }                                  
         </script>
         <div class="flex-grow-1">   
 {{end}} 

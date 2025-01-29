@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -129,6 +130,7 @@ func (districts *Districts) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				newdistrict.Id=uuid.NewString()
 				u, err := districts.add(&newdistrict)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))

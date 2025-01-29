@@ -14,6 +14,7 @@ import (
 	"example.com/messages"
 	"example.com/users"
 	"github.com/astaxie/beego/session"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -93,7 +94,7 @@ func main() {
 
 	if !exists {
 		db.CreateCollection(context.TODO(), "user")
-		user := users.User{Email: os.Getenv("DefaultEmail"), Password: os.Getenv("DefaultPassword"), Active: true}
+		user := users.User{Email: os.Getenv("DefaultEmail"), Password: os.Getenv("DefaultPassword"), Active: true,Id: uuid.NewString()}
 		_, err = u.Register(&user)
 		if err != nil {
 			log.Fatal("Error initializing default users")

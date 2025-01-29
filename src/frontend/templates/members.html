@@ -1,19 +1,9 @@
 {{template "header"}}
     <title>{{.Title}}</title>
-    <script>
-    var members = [];
-    fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
-    (result)=>{                    
-            if (!result.ok){                    
-                throw new Error(JSON.stringify(result.body));
-            }
-            return result.json();
-    }).then((data)=>{
-                members=data.members    
-    }).catch((e)=>{})
-
-</script>
-{{template "body"}} 
+{{template "body"}}
+<script>
+     var members=[]     
+</script> 
 
 <div class="container mt-3">
     <div class="d-flex justify-content-around">
@@ -31,8 +21,19 @@
             </button> 
         </div>
     </div>
-    <div>
-
+    <div class="d-flex justify-content-end">
+        <form class="row g-3" id="searchform">
+            <div class="col-auto">
+                <input type="text" class="form-control" id="search" placeholder="Search">
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+              </div>  
+        </form>
+    </div>        
+    <div class="container mt-3">
+        <div class="row row-cols-3 row-cols-lg-6 g-3" id="membergroup">
+        </div>
     </div>
 </div>
 <div class="modal fade" id="modaladd" tabindex="-1" aria-labelledby="modallabel" aria-hidden="true" >
@@ -69,8 +70,56 @@
     </div>
 </div>
 <script>
-    document.getElementById("numberofmembers").innerHTML=members.length
-    
+
+    var searchform=document.getElementById("searchform")
+    searchform.addEventListener("submit", function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        const found = (members||[]).filter((element) => element.Name.includes(searchform.search.value) || element.Email.includes(searchform.search.value))
+        loaddata(found)
+    })
+
+    function loaddata(data){
+        const groupcard =document.getElementById("membergroup")
+        groupcard.innerHTML=""
+        data.forEach(element => {
+            const column=document.createElement("div")
+            column.classList.add("col")
+            const card=document.createElement("div")
+            card.classList.add("card" ,"h-100")
+            card.style.maxWidth="18rem"
+            const cardimage = document.createElement('img');
+            cardimage.src=element.Passport
+            cardimage.classList.add("card-img-top")
+            const cardbody=document.createElement("div")
+            cardbody.classList.add("card-body")
+            const title = document.createElement('h3');
+            title.classList.add("card-title")
+            title.textContent = element.Name;
+            const description = document.createElement('p');
+            description.classList.add("card-text")
+            description.textContent = element.Email; 
+            cardbody.appendChild(title);
+            cardbody.appendChild(description);
+            card.appendChild(cardbody)
+            card.appendChild(cardimage)
+            column.appendChild(card)
+            groupcard.appendChild(column)
+        });
+    }
+
+    fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+        (result)=>{                    
+            if (!result.ok){                    
+                throw new Error(JSON.stringify(result.body));
+            }
+            return result.json();
+        }).then((data)=>{
+            members=data
+            document.getElementById("numberofmembers").innerHTML=members.length 
+            loaddata(members)
+        }).catch((e)=>{
+    })
 
     var form=document.getElementById("registerform")
     form.addEventListener("submit", function(event){
@@ -110,5 +159,10 @@
                 },10000)
         }
     })
+
+     //Initial function called once a page is loaded
+    window.onload=function () {
+        loadcompleted()  
+    }; 
 </script>
 {{template "footer"}} 

@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -127,6 +128,7 @@ func (messages *Messages) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
+				newmessage.Id=uuid.NewString()
 				u, err := messages.add(&newmessage)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))

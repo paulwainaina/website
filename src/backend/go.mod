@@ -12,7 +12,10 @@ require (
 	github.com/joho/godotenv v1.5.1
 )
 
-require golang.org/x/text v0.21.0 // indirect
+require (
+	github.com/google/uuid v1.6.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
+)
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
