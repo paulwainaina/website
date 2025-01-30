@@ -2,7 +2,9 @@
     <title>{{.Title}}</title>
 {{template "body"}}
 <script>
-     var members=[]     
+     var members=[] 
+     var districts=[{"Id":"-1","Name":"Nothing selected"}]  
+     var groups=[{"Id":"-1","Name":"Nothing selected"},{"Id":"-2","Name":"Nothing selected"}]  
 </script> 
 
 <div class="container mt-3">
@@ -16,7 +18,7 @@
             </div>
         </div>
         <div>
-            <button type="button" class="btn btn-success" onclick="loaddata(null)" ><!-- data-bs-toggle="modal" data-bs-target="#modaladd" !-->
+            <button type="button" class="btn btn-success" id="openmodal" ><!-- data-bs-toggle="modal" data-bs-target="#modaladd" !-->
                 <i class="bi bi-plus"></i>Add Member
             </button> 
         </div>
@@ -40,7 +42,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="modallabel">Register New Member</h1>
+                <h1 class="modal-title fs-5" id="modallabel">Member Management</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -59,7 +61,37 @@
                             Please provide a valid email
                         </div>             
                     </div>
-                    <button type="submit" class="btn btn-primary">Register</button>                                   
+                    <div class="mb-3">
+                        <label for="usercontact" class="sr-only" >Contact</label>
+                        <input type="text" class="form-control" id="usercontact" >       
+                    </div>
+                    <div class="mb-3">
+                        <label for="userbirth" class="sr-only" >Date of Birth</label>
+                        <input type="date" class="form-control" id="userbirth" >       
+                    </div>
+                    <div class="mb-3">
+                        <label for="userbaptism" class="sr-only" >Date of Baptism</label>
+                        <input type="date" class="form-control" id="userbaptism" >       
+                    </div>
+                    <div class="mb-3">
+                        <label for="usercatechism" class="sr-only" >Date of Catechism</label>
+                        <input type="date" class="form-control" id="usercatechism" >       
+                    </div>
+                    <div class="mb-3">
+                        <select class="form-select" id="userdistrict">
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="p-3" id="usergroups">
+                            
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-evenly mb-3">
+                        <button type="submit" class="btn btn-primary" id="btn-add">Register</button> 
+                        <button type="button" class="btn btn-warning" id="btn-update">Update</button>
+                        <button type="button" class="btn btn-danger" id="btn-delete">Delete</button>
+                    </div>
+                                                      
                 </form>
                 <div id="errorDiv" class="alter" role="alter"> </div>
             </div>
@@ -72,16 +104,58 @@
 <script>
     var searchform=document.getElementById("searchform")
     var form=document.getElementById("registerform")
+
     function loadmodal(data){
-        let myModal = new bootstrap.Modal(document.getElementById('modaladd'), {})      
+        let myModal = new bootstrap.Modal(document.getElementById('modaladd'), {})
+        if (districts!='undefined' && districts){ 
+           form.userdistrict.innerHTML=""
+            districts.forEach((element)=>{
+                let option = document.createElement("option");
+                option.value = element.Id;
+                option.text = element.Name;
+                form.userdistrict.add(option);
+            })
+        }
+        if (groups!='undefined' && groups){
+            var field=document.getElementById("usergroups")
+            field.innerHTML=""
+            groups.forEach((element)=>{
+                const box=document.createElement("div")
+                box.classList.add("form-check","form-switch")
+                const input=document.createElement("input")
+                input.classList.add("form-check-input")
+                input.setAttribute("type","checkbox")
+                input.setAttribute("value",element.Id)
+                input.setAttribute("id","g_"+element.Id)
+                const label=document.createElement("label")
+                label.classList.add("form-check-label")
+                label.setAttribute("for","g_"+element.Id)
+                label.textContent=element.Name
+                box.appendChild(label)
+                box.appendChild(input)
+                field.appendChild(box)
+            })
+        }
+        myModal.show()      
         if (data!='undefined' && data){           
            const found=members.find((element)=> element.Id==data)       
            form.username.value=found.Name
            form.useremail.value=found.Email
-        }   
-        myModal.show()
+           document.getElementById("btn-add").hidden=true
+           document.getElementById("btn-update").hidden=false
+           document.getElementById("btn-delete").hidden=false
+        }else{
+            document.getElementById("btn-add").hidden=false
+           document.getElementById("btn-update").hidden=true
+           document.getElementById("btn-delete").hidden=true
+        }          
     }
 
+    document.getElementById("openmodal").addEventListener("click",(e)=>{
+        event.preventDefault()
+        event.stopPropagation()
+        loadmodal(null)
+    })
    
     searchform.addEventListener("submit", function(event){
         event.preventDefault()
@@ -91,6 +165,7 @@
     })
 
     function loaddata(data){
+        if(data!='undefined' && data){
         const groupcard =document.getElementById("membergroup")
         groupcard.innerHTML=""
         data.forEach(element => {
@@ -121,6 +196,7 @@
             })
             groupcard.appendChild(column)
         });
+    }
     }
 
     fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
