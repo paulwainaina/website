@@ -102,6 +102,7 @@
     </div>
 </div>
 <script>
+    var selectedMember=""
     var searchform=document.getElementById("searchform")
     var form=document.getElementById("registerform")
 
@@ -141,6 +142,7 @@
            const found=members.find((element)=> element.Id==data)       
            form.username.value=found.Name
            form.useremail.value=found.Email
+           selectedMember=data
            document.getElementById("btn-add").hidden=true
            document.getElementById("btn-update").hidden=false
            document.getElementById("btn-delete").hidden=false
@@ -212,6 +214,30 @@
         }).catch((e)=>{
     })
 
+    document.getElementById("btn-delete").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Id":selectedMember})
+            fetch('https://localhost:8080/member',{ method:'DELETE',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then().catch()
+        }
+
+    })
+
+    function getgroups(){
+        var checkboxes=document.querySelectorAll('.form-check-input')
+        var result=""
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                if (result!==""){
+                    result+=";"
+                }
+                result+=checkbox.value
+            }
+            console.log(result)
+        });
+        return result
+    }
    
     form.addEventListener("submit", function(event){
         event.preventDefault()
@@ -219,7 +245,9 @@
         form.classList.add('was-validated') 
         if (form.checkValidity()){
             var y=document.getElementById('errorDiv')
-                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value})
+                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Contacts":form.usercontact.value,"DBirth":form.userbirth.value,"DBaptism":form.userbaptism.value,"DCatechism":form.usercatechism.value,"District":form.userdistrict.value,
+                    "Groups":getgroups(),
+                })
                 fetch('https://localhost:8080/member',{ method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
                     (result)=>{                    
                         if (!result.ok){                    
@@ -235,8 +263,7 @@
                             form.classList.remove('was-validated')
                         }else{
                             y.classList.add("alter-success")
-                            y.innerHTML="Districts data fetched"  
-                            //members.push(JSON.stringify(data))                          
+                            y.innerHTML="Districts data fetched"                          
                         }
                     }
                 ).catch((e)=>{

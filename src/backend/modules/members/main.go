@@ -140,7 +140,7 @@ func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				newmember.Id=uuid.NewString()
+				newmember.Id = uuid.NewString()
 				u, err := members.add(&newmember)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))
@@ -151,10 +151,6 @@ func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		case http.MethodGet:
 			{
-				if len(members.members) == 0 {
-					json.NewEncoder(w).Encode("{error: no users found}")
-					return
-				}
 				result := make([]Member, 0)
 				for _, m := range members.members {
 					result = append(result, *m)
