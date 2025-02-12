@@ -19,9 +19,9 @@ type Member struct {
 	Name            string `bson:"Name"`
 	Email           string `bson:"Email"`
 	Contacts        string `bson:"Contacts`
-	DateofBirth     string `bson:"DBirth"`
-	DateofBaptism   string `bson:"DBaptism"`
-	DateofCatechism string `bson:"DCatechism"`
+	DateofBirth     string `bson:"DateofBirth"`
+	DateofBaptism   string `bson:"DateofBaptism"`
+	DateofCatechism string `bson:"DateofCatechism"`
 	District        string `bson:"District"`
 	Groups          string `bson:"Groups"`
 	Passport        string `bson:"Passport"`

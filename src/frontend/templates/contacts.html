@@ -24,7 +24,7 @@
                             </div>
                         </div>
                         <br>
-                        <div id="errorDiv" class="alter" role="alter">
+                        <div id="errorDiv" class="alert" role="alert">
         
                         </div>
                     </form>
@@ -53,21 +53,21 @@
                 ).then(
                     (data)=>{    
                         if(data.hasOwnProperty('Error')){
-                            y.classList.add("alter-danger")
+                            y.classList.add("alert-danger")
                             y.innerHTML=data['Error']
                             form.classList.remove('was-validated')
                         }else{
-                            y.classList.add("alter-success")
+                            y.classList.add("alert-success")
                             y.innerHTML="Message sent"                          
                         }
                     }
                 ).catch((e)=>{
-                    y.classList.add("alter-danger")
+                    y.classList.add("alert-danger")
                     y.innerHTML=e
                     form.classList.remove('was-validated')
                 })            
                 setTimeout(()=>{ 
-                    y.className="alter"
+                    y.className="alert"
                     y.innerHTML=""
                 },10000)
         }

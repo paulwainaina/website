@@ -3,15 +3,15 @@
 {{template "body"}}
 <script>
      var members=[] 
-     var districts=[{"Id":"-1","Name":"Nothing selected"}]  
-     var groups=[{"Id":"-1","Name":"Nothing selected"},{"Id":"-2","Name":"Nothing selected"}]  
+     var districts=[]  
+     var groups=[]  
 </script> 
 
 <div class="container mt-3">
     <div class="d-flex justify-content-around">
         <div >
-            <div class="card" style="width:18rem">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-body p-3 w-auto h-100">
                     <h4 class="card-title">Members</h4>
                     <h1 id="numberofmembers" class="card-text"> </h1>
                 </div>
@@ -36,6 +36,19 @@
     <div class="container mt-3">
         <div class="row row-cols-3 row-cols-lg-6 g-3" id="membergroup">
         </div>
+        <div id="statusDiv" class="d-flex justify-content-center alert mx-auto" role="alert" style="width: 50%;"> </div>
+        <script>
+                const statusNode= document.getElementById("statusDiv")
+                const observer = new MutationObserver((mutationsList)=>{
+                    mutationsList.forEach(function(mutation) {
+                        setTimeout(()=>{
+                            statusNode.classList.remove("alert-danger","alert-success","alert-warning")
+                            statusNode.innerHTML=""
+                        },10000)
+                    })
+                })
+                observer.observe(statusNode,{cattributes:true,childList:true,characterData:true})
+        </script>
     </div>
 </div>
 <div class="modal fade" id="modaladd" tabindex="-1" aria-labelledby="modallabel" aria-hidden="true" >
@@ -93,7 +106,19 @@
                     </div>
                                                       
                 </form>
-                <div id="errorDiv" class="alter" role="alter"> </div>
+                <div id="errorDiv" class="d-flex justify-content-center alert mx-auto" role="alert" style="width: 50%;"> </div>
+                <script>
+                        const statusNode1= document.getElementById("errorDiv")
+                        const observer1 = new MutationObserver((mutationsList)=>{
+                            mutationsList.forEach(function(mutation) {
+                                setTimeout(()=>{
+                                    statusNode.classList.remove("alert-danger","alert-success","alert-warning")
+                                    statusNode.innerHTML=""
+                                },10000)
+                            })
+                        })
+                        observer1.observe(statusNode1,{cattributes:true,childList:true,characterData:true})
+                </script>
             </div>
             <div class="modal-footer">                  
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>                
@@ -142,6 +167,10 @@
            const found=members.find((element)=> element.Id==data)       
            form.username.value=found.Name
            form.useremail.value=found.Email
+           form.usercontact.value=found.Contacts
+           form.userbirth.value=found.DateofBirth
+           form.userbaptism.value=found.DateofBaptism
+           form.usercatechism.value=found.DateofCatechism
            selectedMember=data
            document.getElementById("btn-add").hidden=true
            document.getElementById("btn-update").hidden=false
@@ -152,6 +181,10 @@
            document.getElementById("btn-delete").hidden=true
         }          
     }
+   
+    document.getElementById("modaladd").addEventListener("hidden.bs.modal",function(){
+        window.location.reload()
+    })
 
     document.getElementById("openmodal").addEventListener("click",(e)=>{
         event.preventDefault()
@@ -175,8 +208,7 @@
             column.classList.add("col")
             column.setAttribute("data-id",element.Id)
             const card=document.createElement("div")
-            card.classList.add("card" ,"h-100")
-            card.style.maxWidth="18rem"
+            card.classList.add("card" ,"h-100","w-auto","p-3")
             const cardimage = document.createElement('img');
             cardimage.src=element.Passport
             cardimage.classList.add("card-img-top")
@@ -201,25 +233,64 @@
     }
     }
 
-    fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
-        (result)=>{                    
-            if (!result.ok){                    
-                throw new Error(JSON.stringify(result.body));
-            }
-            return result.json();
-        }).then((data)=>{
-            members=data
-            document.getElementById("numberofmembers").innerHTML=members.length 
-            loaddata(members)
-        }).catch((e)=>{
-    })
+   
 
     document.getElementById("btn-delete").addEventListener("click",function(event){
         event.preventDefault()
         event.stopPropagation()
         if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
             var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Id":selectedMember})
-            fetch('https://localhost:8080/member',{ method:'DELETE',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then().catch()
+            fetch('https://localhost:8080/member',{ method:'DELETE',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+            (data)=>{
+                if(data.hasOwnProperty('Error')){
+                    y.classList.add("alert-warning")
+                    y.innerHTML=data['Error']
+                    form.classList.remove('was-validated')
+                }else{
+                    y.classList.add("alert-success")
+                    y.innerHTML="Member deleted"                          
+                }
+            }).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+            })            
+        }
+
+    })
+
+    document.getElementById("btn-update").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Contacts":form.usercontact.value,"DateofBirth":form.userbirth.value,"DateofBaptism":form.userbaptism.value,"DateofCatechism":form.usercatechism.value,"District":form.userdistrict.value,
+                    "Groups":getgroups(),"Id":selectedMember
+                })
+                fetch('https://localhost:8080/member',{ method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alert-warning")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alert-success")
+                            y.innerHTML="Member data updated"                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+                })   
         }
 
     })
@@ -245,7 +316,7 @@
         form.classList.add('was-validated') 
         if (form.checkValidity()){
             var y=document.getElementById('errorDiv')
-                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Contacts":form.usercontact.value,"DBirth":form.userbirth.value,"DBaptism":form.userbaptism.value,"DCatechism":form.usercatechism.value,"District":form.userdistrict.value,
+                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Contacts":form.usercontact.value,"DateofBirth":form.userbirth.value,"DateofBaptism":form.userbaptism.value,"DateofCatechism":form.usercatechism.value,"District":form.userdistrict.value,
                     "Groups":getgroups(),
                 })
                 fetch('https://localhost:8080/member',{ method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
@@ -258,29 +329,66 @@
                 ).then(
                     (data)=>{    
                         if(data.hasOwnProperty('Error')){
-                            y.classList.add("alter-danger")
+                            y.classList.add("alert-warning")
                             y.innerHTML=data['Error']
                             form.classList.remove('was-validated')
                         }else{
-                            y.classList.add("alter-success")
-                            y.innerHTML="Districts data fetched"                          
+                            y.classList.add("alert-success")
+                            y.innerHTML="Member registered"                          
                         }
                     }
                 ).catch((e)=>{
-                    y.classList.add("alter-danger")
-                    y.innerHTML=e
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
                     form.classList.remove('was-validated')
-                })            
-                setTimeout(()=>{ 
-                    y.className="alter"
-                    y.innerHTML=""
-                },10000)
+                })   
         }
     })
 
      //Initial function called once a page is loaded
     window.onload=function () {
-        loadcompleted()  
+        loadcompleted()
+
+        var status =document.getElementById("statusDiv")    
+        fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                members=data
+                document.getElementById("numberofmembers").innerHTML=members.length 
+                loaddata(members)
+                status.classList.add("alert-success")
+                status.innerHTML="Fetching member data completed"
+                
+            }).catch((e)=>{
+                status.classList.add("alert-warning")
+                status.innerHTML="Something went wrong"                
+        }) 
+        fetch('https://localhost:8080/group',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                groups=data
+                
+            }).catch((e)=>{               
+        }) 
+        fetch('https://localhost:8080/district',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+               districts=data
+                
+            }).catch((e)=>{               
+        }) 
     }; 
 </script>
 {{template "footer"}} 

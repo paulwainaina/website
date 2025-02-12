@@ -130,7 +130,7 @@ func (districts *Districts) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				newdistrict.Id=uuid.NewString()
+				newdistrict.Id = uuid.NewString()
 				u, err := districts.add(&newdistrict)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))
@@ -141,11 +141,11 @@ func (districts *Districts) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		case http.MethodGet:
 			{
-				if len(districts.districts) == 0 {
-					json.NewEncoder(w).Encode("{error: no users found}")
-					return
+				result := make([]District, 0)
+				for _, m := range districts.districts {
+					result = append(result, *m)
 				}
-				json.NewEncoder(w).Encode(fmt.Sprintf("{districts: %v}", districts.districts))
+				json.NewEncoder(w).Encode(result)
 				return
 			}
 		case http.MethodDelete:

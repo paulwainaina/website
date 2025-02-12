@@ -130,7 +130,7 @@ func (groups *Groups) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				newgroup.Id=uuid.NewString()
+				newgroup.Id = uuid.NewString()
 				u, err := groups.add(&newgroup)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))
@@ -141,11 +141,12 @@ func (groups *Groups) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		case http.MethodGet:
 			{
-				if len(groups.groups) == 0 {
-					json.NewEncoder(w).Encode("{error: no users found}")
-					return
+
+				result := make([]Group, 0)
+				for _, m := range groups.groups {
+					result = append(result, *m)
 				}
-				json.NewEncoder(w).Encode(fmt.Sprintf("{groups: %v}", groups.groups))
+				json.NewEncoder(w).Encode(result)
 				return
 			}
 		case http.MethodDelete:
