@@ -18,7 +18,7 @@ type Member struct {
 	Id              string `bson:"Id"`
 	Name            string `bson:"Name"`
 	Email           string `bson:"Email"`
-	Contacts        string `bson:"Contacts`
+	Contacts        string `bson:"Contacts"`
 	DateofBirth     string `bson:"DateofBirth"`
 	DateofBaptism   string `bson:"DateofBaptism"`
 	DateofCatechism string `bson:"DateofCatechism"`
@@ -91,38 +91,32 @@ func (members *Members) delete(oldmember *Member) (*Member, error) {
 }
 
 func (members *Members) update(update map[string]interface{}) (*Member, error) {
-	var usr Member
-	var fields []string
-	rv := reflect.ValueOf(usr)
+	usr := Member{}
 	for key, value := range update {
-		field := rv.FieldByName(key)
+		field := reflect.ValueOf(&usr).Elem().FieldByName(key)
 		if field.IsValid() && field.CanSet() {
 			val := reflect.ValueOf(value)
 			if field.Type() == val.Type() {
 				field.Set(val)
 			} else {
-				return nil, fmt.Errorf("update field with type mismatch %v ", key)
+				return nil, fmt.Errorf("Type mismatch for field %s", key)
 			}
-			fields = append(fields, key)
-		}
-	}
-	req := 0
-	for i, v := range fields {
-		if strings.EqualFold(v, "Id") || strings.EqualFold(v, "Email") {
-			req += 1
-		}
-		if i == len(fields)-1 && req != 2 {
-			return nil, fmt.Errorf("update missing important fields")
 		}
 	}
 	for _, member := range members.members {
 		if strings.EqualFold(member.Email, usr.Email) && strings.EqualFold(member.Id, usr.Id) {
-
-			col := members.db.Collection(memberCollection)
-			_, err := col.UpdateByID(context.TODO(), usr.Id, usr)
+			update := bson.M{}
+			bsonData, err := bson.Marshal(usr)
 			if err != nil {
-				return nil, fmt.Errorf("error updating member")
+				return nil, fmt.Errorf("error updating member %s", err)
 			}
+			bson.Unmarshal(bsonData, &update)
+			col := members.db.Collection(memberCollection)
+			_, err = col.UpdateOne(context.TODO(), bson.M{"Id": usr.Id}, bson.M{"$set": update})
+			if err != nil {
+				return nil, fmt.Errorf("error updating member %s", err)
+			}
+			*member = usr
 			return &usr, nil
 		}
 	}
