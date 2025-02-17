@@ -1,13 +1,176 @@
 {{template "header"}}
     <title>{{.Title}}</title>
 {{template "body"}} 
+<script>
+    var groups=[]
+</script>
+<div class="container mt-3">
+    <div class="d-flex justify-content-around">
+        <div >
+            <div class="card">
+                <div class="card-body p-3 w-auto h-100">
+                    <h4 class="card-title">Groups</h4>
+                    <h1 id="numberofgroups" class="card-text"> </h1>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button type="button" class="btn btn-success" id="openmodal" ><!-- data-bs-toggle="modal" data-bs-target="#modaladd" !-->
+                <i class="bi bi-plus"></i>Group
+            </button> 
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <form class="row g-3" id="searchform">
+            <div class="col-auto">
+                <input type="text" class="form-control" id="search" placeholder="Search">
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+              </div>  
+        </form>
+    </div>
+    <div class="container mt-3">
+        <div class="row row-cols-3 row-cols-lg-6 g-3" id="groupgroup">
+        </div>
+        <div id="statusDiv" class="d-flex justify-content-center alert mx-auto" role="alert" style="width: 50%;"> </div>
+        <script>
+                const statusNode= document.getElementById("statusDiv")
+                const observer = new MutationObserver((mutationsList)=>{
+                    mutationsList.forEach(function(mutation) {
+                        setTimeout(()=>{
+                            statusNode.classList.remove("alert-danger","alert-success","alert-warning")
+                            statusNode.innerHTML=""
+                        },10000)
+                    })
+                })
+                observer.observe(statusNode,{cattributes:true,childList:true,characterData:true})
+        </script>
+    </div>
+</div>
+<div class="modal fade" id="modaladd" tabindex="-1" aria-labelledby="modallabel" aria-hidden="true" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modallabel">Group Management</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation" id="registerform" novalidate style="margin:0 auto;">
+                    <div class="mb-3">
+                        <label for="groupname" class="sr-only" >Member Name</label>
+                        <input type="text" class="form-control" id="groupname"  required autofocus>
+                        <div class="invalid-feedback">
+                            Enter the group name
+                        </div>             
+                    </div>
+                    <div class="mb-3">
+                        <label for="groupemail" class="sr-only" >Email address</label>
+                        <input type="email" class="form-control" id="groupemail"  required autofocus>
+                        <div class="invalid-feedback">
+                            Please provide a valid email
+                        </div>             
+                    </div>
+                    <div class="mb-3">
+                        <label for="groupdescription" class="sr-only" >Description</label> 
+                        <textarea class="form-control" id="groupdescription"></textarea>    
+                    </div>
+                    <div class="d-flex justify-content-evenly mb-3">
+                        <button type="submit" class="btn btn-primary" id="btn-add">Register</button> 
+                        <button type="button" class="btn btn-warning" id="btn-update">Update</button>
+                        <button type="button" class="btn btn-danger" id="btn-delete">Delete</button>
+                    </div>
+                                                      
+                </form>
+                <div id="errorDiv" class="d-flex justify-content-center alert mx-auto" role="alert" style="width: 50%;"> </div>
+                <script>
+                        const statusNode1= document.getElementById("errorDiv")
+                        const observer1 = new MutationObserver((mutationsList)=>{
+                            mutationsList.forEach(function(mutation) {
+                                setTimeout(()=>{
+                                    statusNode.classList.remove("alert-danger","alert-success","alert-warning")
+                                    statusNode.innerHTML=""
+                                },10000)
+                            })
+                        })
+                        observer1.observe(statusNode1,{cattributes:true,childList:true,characterData:true})
+                </script>
+            </div>
+            <div class="modal-footer">                  
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>                
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
      //Initial function called once a page is loaded
+     document.getElementById("openmodal").addEventListener("click",(e)=>{
+        event.preventDefault()
+        event.stopPropagation()
+        loadmodal(null)
+    })
+
+    function loadmodal(data){
+        let myModal = new bootstrap.Modal(document.getElementById('modaladd'), {})
+        myModal.show()
+
+    }
+
      window.onload=function () {
-        loadcompleted()             
+        loadcompleted()
+        var status =document.getElementById("statusDiv") 
+        fetch('https://localhost:8080/group',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                groups=data
+                document.getElementById("numberofgroups").innerHTML=groups.length 
+                status.classList.add("alert-success")
+                status.innerHTML="Fetching groups data completed"
+                
+            }).catch((e)=>{  
+                status.classList.add("alert-warning")
+                status.innerHTML="Something went wrong"              
+        })              
 
     }; 
+    var form=document.getElementById("registerform")
+    form.addEventListener("submit", function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        form.classList.add('was-validated') 
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Name":form.groupname.value,"Email":form.groupemail.value,"Description":form.groupdescription.value})
+                fetch('https://localhost:8080/group',{ method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alert-warning")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alert-success")
+                            y.innerHTML="Group registered"                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+                })   
+        }
+    })
 </script>
 
 {{template "footer"}} 
