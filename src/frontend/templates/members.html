@@ -171,32 +171,33 @@
            form.userbirth.value=found.DateofBirth
            form.userbaptism.value=found.DateofBaptism
            form.usercatechism.value=found.DateofCatechism
+           form.userdistrict.value=found.District
            selectedMember=found.Id
         
            if (found.Groups!==null && found.Groups.length!==0){
-            var result=new Array()
-            if (found.Groups.includes(';')){
-             result= found.Groups.split(';')
-           }
-            else{
-                result.push(found.Groups)
-            }
-            if (Array.isArray(result)){
-            result.forEach((element)=>{
-                var checkbox=document.getElementById("g_"+element)
-                if (checkbox){
-                    checkbox.checked=true}})
+                var result=new Array()
+                if (found.Groups.includes(';')){
+                    result= found.Groups.split(';')
                 }
-                
-        }
+                else{
+                    result.push(found.Groups)
+                }
+                if (Array.isArray(result)){
+                    result.forEach((element)=>{
+                        var checkbox=document.getElementById("g_"+element)
+                        if (checkbox){
+                            checkbox.checked=true}
+                    })
+                }                    
+            }
 
-           document.getElementById("btn-add").hidden=true
-           document.getElementById("btn-update").hidden=false
-           document.getElementById("btn-delete").hidden=false
+            document.getElementById("btn-add").hidden=true
+            document.getElementById("btn-update").hidden=false
+            document.getElementById("btn-delete").hidden=false
         }else{
             document.getElementById("btn-add").hidden=false
-           document.getElementById("btn-update").hidden=true
-           document.getElementById("btn-delete").hidden=true
+            document.getElementById("btn-update").hidden=true
+            document.getElementById("btn-delete").hidden=true
         }          
     }
    

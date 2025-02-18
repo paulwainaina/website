@@ -105,13 +105,13 @@ func (groups *Groups) update(update map[string]interface{}) (*Group, error) {
 			return nil, fmt.Errorf("update missing important fields")
 		}
 	}
-	for _, group := range groups.groups {
-		if strings.EqualFold(group.Id, usr.Id) {
+	for _, district := range groups.groups {
+		if strings.EqualFold(district.Id, usr.Id) {
 
 			col := groups.db.Collection(groupCollection)
 			_, err := col.UpdateByID(context.TODO(), usr.Id, usr)
 			if err != nil {
-				return nil, fmt.Errorf("error updating group")
+				return nil, fmt.Errorf("error updating district")
 			}
 			return &usr, nil
 		}

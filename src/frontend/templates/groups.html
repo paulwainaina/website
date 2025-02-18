@@ -104,8 +104,13 @@
 </div>
 
 <script>
-     //Initial function called once a page is loaded
-     document.getElementById("openmodal").addEventListener("click",(e)=>{
+    var selectedGroup=""
+    
+    document.getElementById("modaladd").addEventListener("hidden.bs.modal",function(){
+        window.location.reload()
+    })
+
+    document.getElementById("openmodal").addEventListener("click",(e)=>{
         event.preventDefault()
         event.stopPropagation()
         loadmodal(null)
@@ -114,7 +119,61 @@
     function loadmodal(data){
         let myModal = new bootstrap.Modal(document.getElementById('modaladd'), {})
         myModal.show()
+        if(data!='undefined' && data){
+            const found=groups.find((element)=> element.Id==data)
+            form.groupname.value=found.Name
+            form.groupemail.value=found.Email
+            form.groupdescription=found.Description
+            selectedGroup=found.Id
+            document.getElementById("btn-add").hidden=true
+            document.getElementById("btn-update").hidden=false
+            document.getElementById("btn-delete").hidden=false
+        }else{
+            document.getElementById("btn-add").hidden=false
+            document.getElementById("btn-update").hidden=true
+            document.getElementById("btn-delete").hidden=true
+        }
+    }
 
+    searchform.addEventListener("submit", function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        const found = (groups||[]).filter((element) => element.Name.includes(searchform.search.value) || element.Email.includes(searchform.search.value) || element.Description.includes(searchform.search.value))
+        loaddata(found)
+    })
+
+    function loaddata(data){
+        const groupcard =document.getElementById("groupgroup")
+        groupcard.innerHTML=""
+        if(data!='undefined' && data){
+            data.forEach(element => {
+            const column=document.createElement("div")
+            column.classList.add("col")
+            column.setAttribute("data-id",element.Id)
+            const card=document.createElement("div")
+            card.classList.add("card" ,"h-100","w-auto","p-3")
+            const cardimage = document.createElement('img');
+            cardimage.src=element.Passport
+            cardimage.classList.add("card-img-top")
+            const cardbody=document.createElement("div")
+            cardbody.classList.add("card-body")
+            const title = document.createElement('h3');
+            title.classList.add("card-title")
+            title.textContent = element.Name;
+            const description = document.createElement('p');
+            description.classList.add("card-text")
+            description.textContent = element.Email; 
+            cardbody.appendChild(title);
+            cardbody.appendChild(description);
+            card.appendChild(cardbody)
+            card.appendChild(cardimage)
+            column.appendChild(card)
+            column.addEventListener("click",(e)=>{
+                loadmodal(element.Id)
+            })
+            groupcard.appendChild(column)
+        })
+        }
     }
 
      window.onload=function () {
@@ -128,6 +187,7 @@
                 return result.json();
             }).then((data)=>{
                 groups=data
+                loaddata(groups)
                 document.getElementById("numberofgroups").innerHTML=groups.length 
                 status.classList.add("alert-success")
                 status.innerHTML="Fetching groups data completed"
@@ -137,7 +197,66 @@
                 status.innerHTML="Something went wrong"              
         })              
 
-    }; 
+    };
+    
+    document.getElementById("btn-delete").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+            var data=JSON.stringify({"Name":form.groupname.value,"Email":form.groupemail.value,"Id":selectedGroup})
+            fetch('https://localhost:8080/group',{ method:'DELETE',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+            (data)=>{
+                if(data.hasOwnProperty('Error')){
+                    y.classList.add("alert-warning")
+                    y.innerHTML=data['Error']
+                    form.classList.remove('was-validated')
+                }else{
+                    y.classList.add("alert-success")
+                    y.innerHTML="Group deleted"                          
+                }
+            }).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+            })            
+        }
+
+    })
+
+    document.getElementById("btn-update").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Name":form.groupname.value,"Email":form.groupemail.value,"Id":selectedGroup,"Description":form.groupdescription.value })
+                fetch('https://localhost:8080/group',{ method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alert-warning")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alert-success")
+                            y.innerHTML="Group data updated"                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+                })   
+        }
+
+    })
+
     var form=document.getElementById("registerform")
     form.addEventListener("submit", function(event){
         event.preventDefault()
