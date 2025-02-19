@@ -1,182 +1,41 @@
 {{template "header"}}
 <title>{{.Title}}</title>
 {{template "body"}}  
-<style>
-   
-    body {
-        background-color: #fff; 
-        color: #333;
-        font-family: 'Roboto', sans-serif;
+<script>
+    .carousel-inner {
+    height: 500px; /* You can adjust this height as needed */
+    overflow: hidden; /* Hide anything that overflows the container */
     }
 
-    h1, h5 {
-        color: #007bff; 
-        font-family: 'Poppins', sans-serif;
+    /* Ensure images fill the entire carousel item without stretching */
+    .carousel-inner img {
+    object-fit: cover; /* This makes sure images cover the area without stretching */
+    width: 100%; /* Ensure the images fill the width of the container */
+    height: 100%; /* Ensure the images fill the height of the container */
     }
-
-    .timeline {
-        position: relative;
-        padding: 40px 0;
-    }
-
-    .timeline::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        width: 2px;
-        background: #ddd;
-        transform: translateX(-50%);
-    }
-
-    .timeline-item {
-        position: relative;
-        padding-left: 50px;
-        margin-bottom: 20px;
-    }
-
- 
-    .timeline-item::before {
-        content: '';
-        position: absolute;
-        left: -25px;
-        top: 10px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: #007bff; 
-        border: 2px solid #fff;
-    }
-
-    .timeline-item:nth-child(even) {
-        padding-left: 0;
-        padding-right: 50px;
-    }
-
-    .timeline-item:nth-child(even) .timeline-content {
-        background-color: #ffeff1; 
-        text-align: right;
-    }
-
-    .timeline-item:nth-child(even)::before {
-        left: auto;
-        right: -25px;
-        background-color: #ff4b5c; 
-    }
-
-   
-    .timeline-content {
-        padding: 20px;
-        background-color: #ffffff; 
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .timeline-content h5 {
-        margin-top: 0;
-        font-weight: 300;
-    }
-
-   
-    .timeline-item:hover .timeline-content {
-        background-color: #f1f9fc; 
-        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.2);
-    }
-.carousel-inner {
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-}
-
-
-.carousel-item img {
-    object-fit: cover; 
-    max-width: 100%; 
-    height: 300px; 
-    margin: 0 auto; 
-    border-radius: 10px; 
-}
-
-
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        background-color: #007bff; 
-    }
-
-    .carousel-control-prev-icon:hover,
-    .carousel-control-next-icon:hover {
-        background-color: #ff4b5c; 
-    }
-    .carousel-control-prev-icon:hover,
-    .carousel-control-next-icon:hover {
-        background-color: #ff4b5c; 
-    }
-
-   
-    button, a {
-        background-color: #ff4b5c; 
-        color: #fff;
-        border-radius: 5px;
-        padding: 10px 20px;
-        text-decoration: none;
-    }
-
-
-
- 
-    footer {
-        background-color: #ff4b5c;
-        color: #fff;
-        padding: 20px;
-        text-align: center;
-        font-size: 14px;
-    }
-
-    footer a {
-        color: #fff;
-        text-decoration: none;
-    }
-
-    footer a:hover {
-        color: #f1f1f1; 
-    }
-
-    @media (max-width: 768px) {
-        .timeline-item {
-            padding-left: 0;
-            padding-right: 0;
-        }
-        .timeline-item:nth-child(even) .timeline-content,
-        .timeline-item:nth-child(odd) .timeline-content {
-            text-align: left;
-        }
-    }
-</style>
-
+</script>
 <div class="container d-flex flex-column">
-
-    <div class="container" style="height:300px">
+    <div class="container mt-3">
         <div id="carouselExampleFade" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-item active">
-                <img src="https://localhost:4443/assets/favicon.png" class="d-block" alt="..." style="object-fit: cover;">            </div>
-            <div class="carousel-item">
-                <img src="https://localhost:4443/assets/FESTRY.jpg" class="d-block" alt="..." height="300px" style="object-fit: cover;">
-            </div>
-            <div class="carousel-item">
-                <img src="https://localhost:4443/assets/FRONT SIDE.jpg" class="d-block" alt="..." height="300px" style="object-fit: cover;">
-            </div>
-            <div class="carousel-item">
-                <img src="https://localhost:4443/assets/GATE.jpg" class="d-block" alt="..." height="300px" style="object-fit: cover;">
-            </div>
-            <div class="carousel-item">
-                <img src="https://localhost:4443/assets/LANDSCAPE.jpg" class="d-block" alt="..." height="300px" style="object-fit: cover;">
-            </div>
-            <div class="carousel-item">
-                <img src="https://localhost:4443/assets/SUNDAY SCHOOL.jpg" class="d-block" alt="..." height="300px" style="object-fit: cover;">
-            </div>
-            <div class="carousel-item">
-                <img src="https://localhost:4443/assets/POSTER.jpg" class="d-block" alt="..." height="300px" style="object-fit: cover;">
+            <div class="carousel-inner">
+                <div class="carousel-item active" >
+                    <img src="https://localhost:4443/assets/FESTRY.jpg" class="d-block w-100" alt="..." >
+                </div>
+                <div class="carousel-item">
+                    <img src="https://localhost:4443/assets/FRONT SIDE.jpg" class="d-block w-100" alt="..." >
+                </div>
+                <div class="carousel-item">
+                    <img src="https://localhost:4443/assets/GATE.jpg" class="d-block w-100" alt="..." >
+                </div>
+                <div class="carousel-item">
+                    <img src="https://localhost:4443/assets/LANDSCAPE.jpg" class="d-block w-100" alt="..." >
+                </div>
+                <div class="carousel-item">
+                    <img src="https://localhost:4443/assets/SUNDAY SCHOOL.jpg" class="d-block w-100" alt="..." >
+                </div>
+                <div class="carousel-item">
+                    <img src="https://localhost:4443/assets/POSTER.jpg" class="d-block w-100" alt="..." >
+                </div>
             </div>
         </div>
             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
@@ -189,9 +48,7 @@
             </button>
         </div>
     </div>
-
-
-    <div class="container p-5">
+    <div class="container p-3">
         <h1 style="text-align: center;font-weight: 300;">History</h1>
         <div class="timeline">
             <div class="timeline-item">

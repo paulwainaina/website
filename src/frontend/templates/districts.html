@@ -1,55 +1,296 @@
 {{template "header"}}
     <title>{{.Title}}</title>
 {{template "body"}} 
-<div id="errorDiv" class="alert" role="alert">
-
-</div>
 <script>
     var districts=[]
-    var y=document.getElementById('errorDiv')
-
-    fetch('https://localhost:8080/district',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
-        (result)=>{                    
-            if (!result.ok){                    
-                throw new Error(JSON.stringify(result.body));
-            }
-            return result.json();
-        }).then((data)=>{
-            if(data.hasOwnProperty('Error')){
-                y.classList.add("alert-danger")
-                y.innerHTML=data['Error']
-                form.classList.remove('was-validated')
-            }else{
-                y.classList.add("alert-success")
-                y.innerHTML="Districts data fetched" 
-                districts=data.districts  
-            }    
-        }).catch((e)=>{
-            y.classList.add("alert-danger")
-            y.innerHTML=e
-            form.classList.remove('was-validated')
-    })
-    
-    const observer = new MutationObserver(function(mutationsList) {
-    mutationsList.forEach(function(mutation) {
-      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-        setTimeout(()=>{
-                    y.className="alert"
-                    y.innerHTML=""
-                },10000)
-      }
-    });
-    
-    observer.observe(y,{attributes:true,childList:true,characterData:true})
-  });
-   //Initial function called once a page is loaded
-   window.onload=function () {
-        loadcompleted()             
-
-    }; 
-
 </script>
+<div class="container mt-3">
+    <div class="d-flex justify-content-around">
+        <div >
+            <div class="card">
+                <div class="card-body p-3 w-auto h-100">
+                    <h4 class="card-title">Districts</h4>
+                    <h1 id="numberofdistricts" class="card-text"> </h1>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button type="button" class="btn btn-success" id="openmodal" ><!-- data-bs-toggle="modal" data-bs-target="#modaladd" !-->
+                <i class="bi bi-plus"></i>District
+            </button> 
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <form class="row g-3" id="searchform">
+            <div class="col-auto">
+                <input type="text" class="form-control" id="search" placeholder="Search">
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-outline-secondary">Search</button>
+              </div>  
+        </form>
+    </div>
+    <div class="container mt-3">
+        <div class="row row-cols-3 row-cols-lg-6 g-3" id="districtdistrict">
+        </div>
+        <div id="statusDiv" class="d-flex justify-content-center alert mx-auto" role="alert" style="width: 50%;"> </div>
+        <script>
+                const statusNode= document.getElementById("statusDiv")
+                const observer = new MutationObserver((mutationsList)=>{
+                    mutationsList.forEach(function(mutation) {
+                        setTimeout(()=>{
+                            statusNode.classList.remove("alert-danger","alert-success","alert-warning")
+                            statusNode.innerHTML=""
+                        },10000)
+                    })
+                })
+                observer.observe(statusNode,{cattributes:true,childList:true,characterData:true})
+        </script>
+    </div>
+</div>
+<div class="modal fade" id="modaladd" tabindex="-1" aria-labelledby="modallabel" aria-hidden="true" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modallabel">District Management</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="needs-validation" id="registerform" novalidate style="margin:0 auto;">
+                    <div class="mb-3">
+                        <label for="districtname" class="sr-only" >District Name</label>
+                        <input type="text" class="form-control" id="districtname"  required autofocus>
+                        <div class="invalid-feedback">
+                            Enter the district name
+                        </div>             
+                    </div>
+                    <div class="mb-3">
+                        <label for="districtemail" class="sr-only" >Email address</label>
+                        <input type="email" class="form-control" id="districtemail"  required autofocus>
+                        <div class="invalid-feedback">
+                            Please provide a valid email
+                        </div>             
+                    </div>
+                    <div class="mb-3">
+                        <label for="districtdescription" class="sr-only" >Description</label> 
+                        <textarea class="form-control" id="districtdescription"></textarea>    
+                    </div>
+                    <div class="d-flex justify-content-evenly mb-3">
+                        <button type="submit" class="btn btn-primary" id="btn-add">Register</button> 
+                        <button type="button" class="btn btn-warning" id="btn-update">Update</button>
+                        <button type="button" class="btn btn-danger" id="btn-delete">Delete</button>
+                    </div>
+                                                      
+                </form>
+                <div id="errorDiv" class="d-flex justify-content-center alert mx-auto" role="alert" style="width: 50%;"> </div>
+                <script>
+                        const statusNode1= document.getElementById("errorDiv")
+                        const observer1 = new MutationObserver((mutationsList)=>{
+                            mutationsList.forEach(function(mutation) {
+                                setTimeout(()=>{
+                                    statusNode.classList.remove("alert-danger","alert-success","alert-warning")
+                                    statusNode.innerHTML=""
+                                },10000)
+                            })
+                        })
+                        observer1.observe(statusNode1,{cattributes:true,childList:true,characterData:true})
+                </script>
+            </div>
+            <div class="modal-footer">                  
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>                
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+    var selectedDistrict=""
+    
+    document.getElementById("modaladd").addEventListener("hidden.bs.modal",function(){
+        window.location.reload()
+    })
 
+    document.getElementById("openmodal").addEventListener("click",(e)=>{
+        event.preventDefault()
+        event.stopPropagation()
+        loadmodal(null)
+    })
+
+    function loadmodal(data){
+        let myModal = new bootstrap.Modal(document.getElementById('modaladd'), {})
+        myModal.show()
+        if(data!='undefined' && data){
+            const found=districts.find((element)=> element.Id==data)
+            form.districtname.value=found.Name
+            form.districtemail.value=found.Email
+            form.districtdescription=found.Description
+            selectedDistrict=found.Id
+            document.getElementById("btn-add").hidden=true
+            document.getElementById("btn-update").hidden=false
+            document.getElementById("btn-delete").hidden=false
+        }else{
+            document.getElementById("btn-add").hidden=false
+            document.getElementById("btn-update").hidden=true
+            document.getElementById("btn-delete").hidden=true
+        }
+    }
+
+    searchform.addEventListener("submit", function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        const found = (districts||[]).filter((element) => element.Name.includes(searchform.search.value) || element.Email.includes(searchform.search.value) || element.Description.includes(searchform.search.value))
+        loaddata(found)
+    })
+
+    function loaddata(data){
+        const districtcard =document.getElementById("districtdistrict")
+        districtcard.innerHTML=""
+        if(data!='undefined' && data){
+            data.forEach(element => {
+            const column=document.createElement("div")
+            column.classList.add("col")
+            column.setAttribute("data-id",element.Id)
+            const card=document.createElement("div")
+            card.classList.add("card" ,"h-100","w-auto","p-3")
+            const cardimage = document.createElement('img');
+            cardimage.src=element.Passport
+            cardimage.classList.add("card-img-top")
+            const cardbody=document.createElement("div")
+            cardbody.classList.add("card-body")
+            const title = document.createElement('h3');
+            title.classList.add("card-title")
+            title.textContent = element.Name;
+            const description = document.createElement('p');
+            description.classList.add("card-text")
+            description.textContent = element.Email; 
+            cardbody.appendChild(title);
+            cardbody.appendChild(description);
+            card.appendChild(cardbody)
+            card.appendChild(cardimage)
+            column.appendChild(card)
+            
+            column.addEventListener("click",(e)=>{
+                loadmodal(element.Id)
+            })
+            districtcard.appendChild(column)
+        })
+        }
+    }
+
+     window.onload=function () {
+        loadcompleted()
+        var status =document.getElementById("statusDiv") 
+        fetch('https://localhost:8080/district',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                districts=data
+                loaddata(districts)
+                document.getElementById("numberofdistricts").innerHTML=districts.length 
+                status.classList.add("alert-success")
+                status.innerHTML="Fetching districts data completed"
+                
+            }).catch((e)=>{  
+                status.classList.add("alert-warning")
+                status.innerHTML="Something went wrong"              
+        })              
+
+    };
+    
+    document.getElementById("btn-delete").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+            var data=JSON.stringify({"Name":form.districtname.value,"Email":form.districtemail.value,"Id":selectedDistrict})
+            fetch('https://localhost:8080/district',{ method:'DELETE',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+            (data)=>{
+                if(data.hasOwnProperty('Error')){
+                    y.classList.add("alert-warning")
+                    y.innerHTML=data['Error']
+                    form.classList.remove('was-validated')
+                }else{
+                    y.classList.add("alert-success")
+                    y.innerHTML="District deleted"                          
+                }
+            }).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+            })            
+        }
+
+    })
+
+    document.getElementById("btn-update").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Name":form.districtname.value,"Email":form.districtemail.value,"Id":selectedDistrict,"Description":form.districtdescription.value })
+                fetch('https://localhost:8080/district',{ method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alert-warning")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alert-success")
+                            y.innerHTML="District data updated"                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+                })   
+        }
+
+    })
+
+    var form=document.getElementById("registerform")
+    form.addEventListener("submit", function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        form.classList.add('was-validated') 
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Name":form.districtname.value,"Email":form.districtemail.value,"Description":form.districtdescription.value})
+                fetch('https://localhost:8080/district',{ method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alert-warning")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alert-success")
+                            y.innerHTML="District registered"                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+                })   
+        }
+    })
+</script>
 
 {{template "footer"}} 

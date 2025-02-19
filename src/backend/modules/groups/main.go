@@ -81,38 +81,32 @@ func (groups *Groups) delete(oldgroup *Group) (*Group, error) {
 }
 
 func (groups *Groups) update(update map[string]interface{}) (*Group, error) {
-	var usr Group
-	var fields []string
-	rv := reflect.ValueOf(usr)
+	usr := Group{}
 	for key, value := range update {
-		field := rv.FieldByName(key)
+		field := reflect.ValueOf(&usr).Elem().FieldByName(key)
 		if field.IsValid() && field.CanSet() {
 			val := reflect.ValueOf(value)
 			if field.Type() == val.Type() {
 				field.Set(val)
 			} else {
-				return nil, fmt.Errorf("update field with type mismatch %v ", key)
+				return nil, fmt.Errorf("Type mismatch for field %s", key)
 			}
-			fields = append(fields, key)
 		}
 	}
-	req := 0
-	for i, v := range fields {
-		if strings.EqualFold(v, "Id") {
-			req += 1
-		}
-		if i == len(fields)-1 && req != 1 {
-			return nil, fmt.Errorf("update missing important fields")
-		}
-	}
-	for _, district := range groups.groups {
-		if strings.EqualFold(district.Id, usr.Id) {
-
-			col := groups.db.Collection(groupCollection)
-			_, err := col.UpdateByID(context.TODO(), usr.Id, usr)
+	for _, group := range groups.groups {
+		if strings.EqualFold(group.Id, usr.Id) {
+			update := bson.M{}
+			bsonData, err := bson.Marshal(usr)
 			if err != nil {
-				return nil, fmt.Errorf("error updating district")
+				return nil, fmt.Errorf("error updating group %s", err)
 			}
+			bson.Unmarshal(bsonData, &update)
+			col := groups.db.Collection(groupCollection)
+			_, err = col.UpdateOne(context.TODO(), bson.M{"Id": usr.Id}, bson.M{"$set": update})
+			if err != nil {
+				return nil, fmt.Errorf("error updating group %s", err)
+			}
+			*group = usr
 			return &usr, nil
 		}
 	}
