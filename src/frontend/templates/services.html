@@ -1,9 +1,16 @@
 {{template "header"}}
     <title>{{.Title}}</title>
     <style>
+        body {
+            background-image: url('https://localhost:4443/assets/favicon.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+        }
    
         .container {
-            max-width: 800px; 
+            max-width: fit-content; 
             margin: 0 auto; 
             margin-bottom: 20px;
             padding: 20px; 
@@ -12,22 +19,34 @@
             background: linear-gradient(rgb(250, 249, 249), white) padding-box, 
                         linear-gradient(135deg, #3d027c, #2575fc) border-box; 
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
 
         .container:hover {
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); 
-            transform: translateX(2px); 
+            transform: translateY(5px); 
             transition: all 0.3s ease;
-            background-color: #e0e0e0; 
+            background-color: #3d9f42; 
+        }
+
+        .container:img{
+            max-width: 100%;
+            max-height: 100%;
         }
 
         h2 {
-            font-size: 2rem; 
-            color: #333333; 
-            margin-bottom: 15px; 
+            font-size: 2rem;
+            text-align: left;
+            padding: 20px; 
+            color: blue;
         }
 
-
         p {
+            color: black;
             font-size: 1rem; 
             color: #555555; 
             line-height: 1.6; 
@@ -40,36 +59,75 @@
         }
 
         #logo img {
-            max-width: 100%; 
+            max-width: auto; 
             height: auto; 
-            object-fit: contain; 
+            object-fit: cover; 
          
         }
     </style>
 {{template "body"}} 
 <main>
-    <div class="container">
+    <div class="container" id="fadeContainer">
         <section id="youth-service">
-            <h2>Youth Service</h2>
-            <p>Welcome to our Youth Service Join us for exciting activities and programs designed for young people.</p>
+            <h2><b>Youth Resource Center</b></h2>
+            <p><b>This is a youth-based center that will provide the following services:</b>
+                <ul>
+                    <li>Cyber services such as printing, passport, Tax-returns filing, and E-citizen services.  </li>
+                    <li>Meetings and conferences</li>
+                    <li>Computer lessons</li>
+                </ul>
+            </p>
+            <p><b>COMING SOON!!!</p>
         </section>
 
         <div id="logo">
             <img src="https://localhost:4443/assets/logo.jpg" class="d-block" alt="Company Logo">
         </div>
     </div>
-    <div class="container">
+    <div class="container" id="fadeContainer">
         <section id="youth-service">
-            <h2>Kikuyu Service</h2>
-            <p>Welcome to our Kikuyu Service. This is the main service which is streamed live on Youtube. </p>
+            <h2><b>YouTube Livestreaming</b></h2>
+            <p><b>Welcome to our Kikuyu Service. The service starts at 9:30am - 1:00pm</b></p></br>
+            <p>It is livestreamed every Sunday on Youtube. Beside is a thumbnail video of one of the Sunday service. You can check our YouTube page in the link below it. Please remember to like, comment, share, and subscribe to our content</p>
         </section>
 
         <div id="logo">
-            <iframe width="640" height="360" src="https://www.youtube.com/embed/Mzaqw8rmiQ4" title="PCEA KAHUNIRA PARISH SINGING GAME  2023/08/26" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <iframe width="640" height="360" src="https://www.youtube.com/embed/IGyqnqyF2U4" title="WELCOME TO OUR ONLINE KIKUYU SERVICE 19TH JANUARY 2024" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <a class="btn btn-primary" href="https://www.youtube.com/@elijahwathikamemorialchurch" role="button">YouTube Page</a>
         </div>
-
-        <a class="btn btn-primary" href="https://www.youtube.com/@elijahwathikamemorialchurch" role="button">YouTube Link</a>
     </div>
+    <div class="container" id="fadeContainer">
+        <section id="youth-service">
+            <h2><b>Jitegemea Sacco Limited</b></h2>
+            <p><strong>This is the church based sacco which aids christians in borrowing of loans and maintaining their financial credibility.</strong></p>
+            <h3>Our Mission</h3>
+            <p><i>TOGETHER LET US REVIVE OUR SACCO</i></p><br>
+            <p><b>To learn more about Jitegemea Sacco, click here</b> <a class="btn btn-primary" href="" role="button">Learn More</a></p>
+        </section>
+
+        <div id="logo">
+            <img src='https://www.jitegemeesacco.co.ke/wp-content/uploads/2018/11/jitegemee-schema-logo.jpg' class="d-block" alt="Company Logo">
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const container = document.getElementById('fadeContainer');
+            const scrollPosition = window.scrollY;
+            const fadeStart = 0;
+            const fadeEnd = 500;
+
+            let opacity = 1;
+            if (scrollPosition <= fadeStart){
+                opacity = 1;
+            } else if (scrollPosition >= fadeEnd) {
+                opacity = 1;
+            } else {
+                opacity = 1 - (scrollPosition - fadeStart) / (fadeEnd - fadeStart);
+            }
+            container.style.opacity = opacity;
+        });
+    </script>
 </main>
 
 
