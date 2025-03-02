@@ -79,10 +79,23 @@ func DistrictsHandler(w http.ResponseWriter, r *http.Request) {
 	RenderTemplate(w, "districts.html", &Page{Title: "Districts", Data: nil})
 }
 
+func middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Methods", "POST,GET,PUT,DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == "OPTIONS" {
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/home", IndexHandler)
-	router.HandleFunc("/services", ServicesHandler)
+	router.Handle("/services", middleware(http.HandlerFunc(ServicesHandler)))
 	router.HandleFunc("/events", EventsHandler)
 	router.HandleFunc("/contacts", ContactsHandler)
 	router.HandleFunc("/login", LoginHandler)
