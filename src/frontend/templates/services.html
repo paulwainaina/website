@@ -1,5 +1,13 @@
 {{template "header"}}
-    <title>{{.Title}}</title>
+<title>{{.Title}}</title>
+<style>
+    body {
+        background-image: url('../assets/favicon.jpg');
+        background-size: cover;
+        background-repeat: no-repeat; 
+        background-attachment: fixed; 
+    }
+</style>
 {{template "body"}} 
 <div class="container d-flex justify-content-center align-items-center" >   
     <div class="row row-cols-1 row-cols-md-3 g-4 mt-5 mb-5">
@@ -15,6 +23,7 @@
                             <li>Meetings and conferences</li>
                             <li>Computer lessons</li>
                         </ul>
+                        <b>COMING SOON!!!</b>
                     </p>
                 </div>    
             </div>
@@ -25,10 +34,9 @@
                 <div class="card-body">
                     <h2 class="card-title"><b>YouTube Livestreaming</b></h2>
                     <p class="card-text"><b>Welcome to our Kikuyu Service. The service starts at 9:30am - 1:00pm</b></p></br>
-                    <p class="card-text">It is livestreamed every Sunday on Youtube. Beside is a thumbnail video of one of the Sunday service. You can check our YouTube page in the link below it. Please remember to like, comment, share, and subscribe to our content</p>
+                    <p class="card-text">It is livestreamed every Sunday on Youtube. Above is a thumbnail video of one of the Sunday service. You can check our YouTube page in the link below it. Please remember to like, comment, share, and subscribe to our content</p>
                     <a class="btn btn-primary card-text" href="https://www.youtube.com/@elijahwathikamemorialchurch" role="button">YouTube Page</a>
                 </div>
-               
             </div>
         </div>
         <div class="col">
@@ -41,18 +49,65 @@
                     <p class="card-text"><i>TOGETHER LET US REVIVE OUR SACCO</i></p><br>
                     <p class="card-text"><b>To learn more about Jitegemea Sacco, click here</b> <a class="btn btn-primary" href="" role="button">Learn More</a></p>
                 </div>
-               
             </div>
         </div>
     </div>
 </div>
 
-    <script>
-        //Initial function called once a page is loaded
-        window.onload=function () {
-           loadcompleted()             
-   
-       }; 
-   </script>
+<div class="container mt-5">
+    <h2 class="text-center">Gallery</h2>
+    <div class="row no-gutters">
+        <div class="col-md-4">
+            <div class="card">
+                <img src="../assets/GATE.jpg" class="card-img-top" alt="Image 1">
+                <div class="card-body">
+                    <h5 class="card-title">Church Gate</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="../assets/FRONT SIDE.jpg" class="card-img-top" alt="Image 2">
+                <div class="card-body">
+                    <h5 class="card-title">Church Front Side</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="../assets/LANDSCAPE.jpg" class="card-img-top" alt="Image 3">
+                <div class="card-body">
+                    <h5 class="card-title">Church Landscape</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <img src="../assets/FESTRY.jpg" class="card-img-top" alt="Image 4">
+                <div class="card-body">
+                    <h5 class="card-title">Festry, Youth Resource Center, & Kahunira Jitegemea Sacco</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <img src="../assets/SUNDAY SCHOOL.jpg" class="card-img-top" alt="Image 5">
+                <div class="card-body">
+                    <h5 class="card-title">Church Sunday School</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-{{template "footer"}} 
+
+
+<script>
+    //Initial function called once a page is loaded
+    window.onload=function () {
+       loadcompleted()             
+   }; 
+</script>
+
+
+{{template "footer"}}
