@@ -53,6 +53,31 @@
             }
              //Check is a session cookie has been set
             function SessionExists(){
+                fetch('https://localhost:8080/loggedin',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then((result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }).then((data)=>{
+                        var y = JSON.parse(data)
+                        if(y['active']){
+                            document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
+                                link.removeAttribute('aria-disabled')
+                                link.classList.remove('disabled');
+                                document.getElementById("openloginpage").style.display='none'
+                                document.getElementById("logoutsession").style.display='block'
+                            })
+                        }else{
+                            document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
+                                link.setAttribute('aria-disabled', 'true')
+                                link.classList.add('disabled');
+                                document.getElementById("openloginpage").style.display='block'
+                                document.getElementById("logoutsession").style.display='none'
+                            })
+                        }
+                    }).catch((e)=>{
+                        window.location.replace("https://localhost:4443/");
+                    })
                 return document.cookie.split(';').some((item) => item.trim().startsWith('usersessionid='))
             }
 
@@ -65,7 +90,7 @@
             }
 
             function logoutsessionfunc(){   
-                fetch('https://localhost:8080/login').then().catch()
+                fetch('https://localhost:8080/logout').then().catch()
                 deletecookie("usersessionid");
                 window.location.replace("https://localhost:4443/")
              
@@ -83,21 +108,9 @@
                     activeItem.parentElement.style.backgroundColor="grey";
                 }
                 //if session does not exist deactivate some pages
-                if (!SessionExists()){
-                    document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
-                    link.setAttribute('aria-disabled', 'true')
-                    link.classList.add('disabled');
-                    document.getElementById("openloginpage").style.display='block'
-                    document.getElementById("logoutsession").style.display='none'
-                });
-                }else{
-                    document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
-                    link.removeAttribute('aria-disabled')
-                    link.classList.remove('disabled');
-                    document.getElementById("openloginpage").style.display='none'
-                    document.getElementById("logoutsession").style.display='block'
-                })}
+                SessionExists()              
+
             }                                  
         </script>
-        <div style="width:100%">   
+    <div style="width:100%">   
 {{end}} 

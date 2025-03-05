@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +14,6 @@ import (
 	"example.com/groups"
 	"example.com/members"
 	"example.com/messages"
-	"example.com/users"
 	"github.com/astaxie/beego/session"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
@@ -24,25 +25,14 @@ import (
 var (
 	globalSessions *session.Manager
 	tlsConfig      *tls.Config
+	db             *mongo.Database
+	m              *members.Members
 )
 
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
-	}
-	globalSessions, err = session.NewManager("file", &session.ManagerConfig{CookieName: os.Getenv("Session_Cookie"), Gclifetime: 3600, ProviderConfig: "./tmp"})
-	if err != nil {
-		log.Fatalf("Failed to create session manager")
-	}
-	go globalSessions.GC()
-	certificate, err := tls.LoadX509KeyPair("./certificate/cert.pem", "./certificate/key.pem")
-	if err != nil {
-		log.Fatalf("failed to load server certificates: %v", err)
-	}
-	tlsConfig = &tls.Config{
-		Certificates:       []tls.Certificate{certificate},
-		InsecureSkipVerify: true,
 	}
 }
 
@@ -59,11 +49,23 @@ func middleware(next http.Handler) http.Handler {
 		}
 		if !strings.EqualFold(r.URL.Path, "/login") {
 			c, err := r.Cookie(os.Getenv("Session_Cookie"))
-			if err != nil {
-				w.WriteHeader(http.StatusForbidden)
+			cokval := "000"
+			if err == nil {
+				cokval = c.Value
+			}
+			if strings.EqualFold(r.URL.Path, "/loggedin") {
+				store, err := globalSessions.GetProvider().SessionRead(cokval)
+				if err != nil {
+					res := struct{ Error string }{Error: err.Error()}
+					json.NewEncoder(w).Encode(res)
+					return
+				}
+				x, _ := store.Get("useremail").(string)
+				res := fmt.Sprintf(`{"active": %t}`, m.SuperUser(x))
+				json.NewEncoder(w).Encode(res)
 				return
 			}
-			if !globalSessions.GetProvider().SessionExist(c.Value) {
+			if !globalSessions.GetProvider().SessionExist(cokval) {
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
@@ -72,42 +74,57 @@ func middleware(next http.Handler) http.Handler {
 
 	})
 }
+func EmptyHandler(w http.ResponseWriter, r *http.Request) {
+}
 
 func main() {
+	var err error
+	globalSessions, err = session.NewManager("file", &session.ManagerConfig{CookieName: os.Getenv("Session_Cookie"), Gclifetime: 3600, ProviderConfig: "./tmp"})
+	if err != nil {
+		log.Fatalf("Failed to create session manager")
+	}
+	go globalSessions.GC()
+
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv("Mongo_Connect")))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Disconnect(context.TODO())
-	db := client.Database(os.Getenv("Database"))
+	db = client.Database(os.Getenv("Database"))
+	m = members.NewMembers(db, globalSessions)
 	names, err := db.ListCollectionNames(context.TODO(), bson.D{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	u := users.NewUsers(db, globalSessions)
 	exists := false
 	for _, name := range names {
-		if name == "user" {
+		if name == "member" {
 			exists = true
 		}
 	}
-
 	if !exists {
-		db.CreateCollection(context.TODO(), "user")
-		user := users.User{Email: os.Getenv("DefaultEmail"), Password: os.Getenv("DefaultPassword"), Active: true,Id: uuid.NewString()}
-		_, err = u.Register(&user)
+		db.CreateCollection(context.TODO(), "member")
+		member := members.Member{Email: os.Getenv("DefaultEmail"), Password: os.Getenv("DefaultPassword"), Active: true, Id: uuid.NewString(), Role: 1}
+		_, err = m.Add(&member)
 		if err != nil {
-			log.Fatal("Error initializing default users")
+			log.Fatal("Error initializing default user")
 		}
 	}
 
-	router := http.NewServeMux()
-	router.Handle("/login", middleware(http.HandlerFunc(u.ServeHTTP)))
-	router.Handle("/logout", middleware(http.HandlerFunc(u.ServeHTTP)))
-	router.Handle("/user", middleware(http.HandlerFunc(u.ServeHTTP)))
+	certificate, err := tls.LoadX509KeyPair("./certificate/cert.pem", "./certificate/key.pem")
+	if err != nil {
+		log.Fatalf("failed to load server certificates: %v", err)
+	}
+	tlsConfig = &tls.Config{
+		Certificates:       []tls.Certificate{certificate},
+		InsecureSkipVerify: true,
+	}
 
-	m := members.NewMembers(db)
+	router := http.NewServeMux()
+
 	router.Handle("/member", middleware(http.HandlerFunc(m.ServeHTTP)))
+	router.Handle("/login", middleware(http.HandlerFunc(m.ServeHTTP)))
+	router.Handle("/logout", middleware(http.HandlerFunc(m.ServeHTTP)))
 
 	g := groups.NewGroups(db)
 	router.Handle("/group", middleware(http.HandlerFunc(g.ServeHTTP)))
@@ -117,6 +134,8 @@ func main() {
 
 	mes := messages.NewMessages(db)
 	router.Handle("/message", middleware(http.HandlerFunc(mes.ServeHTTP)))
+
+	router.Handle("/loggedin", middleware(http.HandlerFunc(EmptyHandler)))
 
 	server := &http.Server{
 		Addr:      os.Getenv("PORT"),
