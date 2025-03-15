@@ -61,7 +61,7 @@ func middleware(next http.Handler) http.Handler {
 					return
 				}
 				x, _ := store.Get("useremail").(string)
-				res := fmt.Sprintf(`{"active": %t}`, m.SuperUser(x))
+				res := fmt.Sprintf("{active: %t ,useremail :%s}", m.SuperUser(x), x)
 				json.NewEncoder(w).Encode(res)
 				return
 			}

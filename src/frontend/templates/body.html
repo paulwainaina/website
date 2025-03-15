@@ -1,7 +1,7 @@
 {{define "body"}}
 </head>
     <body style="height: 100vh;">
-        <nav class="navbar navbar-expand-lg bg-body-secondary">
+        <nav class="navbar navbar-expand-lg navbar-light fixed-top">
             <div class="container-fluid">
                 <a class="navbar-brand" href="/home">
                     <img src="https://localhost:4443/assets/favicon.png" alt="church logo" width="30" height="30" class="d-inline-block align-text-center" >
@@ -19,11 +19,12 @@
                             <a class="nav-link" href="/services" id="services">Services</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link" href="/events" id="events" >Events</a>
-                        </li>
-                        <li class="nav-item mx-3">
                             <a class="nav-link" href="/contacts" id="contacts">Contacts</a>
                         </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link disabled" href="/profile" id="profile" aria-disabled="true">Profile</a>
+                        </li>
+                        
                         <li class="nav-item mx-3">
                             <a class="nav-link sensitive" href="/members" id="members">Members</a>
                         </li>
@@ -42,6 +43,7 @@
             </div>
         </nav>
         <script> 
+            var loggedin=""
             //Delete cookie
             function deletecookie(name) {
                 /*const cookies = document.cookie.split(";");
@@ -59,8 +61,7 @@
                         }
                         return result.json();
                     }).then((data)=>{
-                        var y = JSON.parse(data)
-                        if(y['active']){
+                        if(data['active']){
                             document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
                                 link.removeAttribute('aria-disabled')
                                 link.classList.remove('disabled');
@@ -75,6 +76,11 @@
                                 document.getElementById("logoutsession").style.display='none'
                             })
                         }
+                        if (data['useremail'] && data['useremail']!==""){
+                        var profile=document.getElementById('profile')
+                        profile.removeAttribute('arial-disabled')
+                        profile.classList.remove('disabled')
+                        loggedin=data['useremail']}
                     }).catch((e)=>{
                         //window.location.replace("https://localhost:4443/");
                     })
@@ -112,5 +118,19 @@
 
             }                                  
         </script>
+        <style>
+            body {
+                background-image: url('../assets/background.jpg');
+                background-size: cover;
+                background-position: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .navbar {
+                background: rgba(0, 0, 0, 0.5); /* Optional: darken the navbar slightly for readability */
+                background-image: inherit; /* Inherit background from body */
+                background-size: cover;
+            }
+        </style>
     <div style="width:100%">   
 {{end}} 

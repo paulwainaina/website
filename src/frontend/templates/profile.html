@@ -1,0 +1,242 @@
+{{template "header"}}
+    <title>{{.Title}}</title>
+{{template "body"}} 
+<div class="container d-flex justify-content-center align-items-center" > 
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Member Management</h5>
+            <form class="needs-validation" id="registerform" novalidate style="margin:0 auto;">
+                <div class="mb-3">
+                    <label for="username" class="sr-only" >Member Name</label>
+                    <input type="text" class="form-control" id="username"  required autofocus>
+                    <div class="invalid-feedback">
+                        Enter the members name
+                    </div>             
+                </div>
+                <div class="mb-3">
+                    <label for="useremail" class="sr-only" >Email address</label>
+                    <input type="email" class="form-control" id="useremail"  required autofocus>
+                    <div class="invalid-feedback">
+                        Please provide a valid email
+                    </div>             
+                </div>
+                <div class="mb-3">
+                    <label for="usercontact" class="sr-only" >Contact</label>
+                    <input type="text" class="form-control" id="usercontact" >       
+                </div>
+                <div class="mb-3">
+                    <label for="userbirth" class="sr-only" >Date of Birth</label>
+                    <input type="date" class="form-control" id="userbirth" >       
+                </div>
+                <div class="mb-3">
+                    <label for="userbaptism" class="sr-only" >Date of Baptism</label>
+                    <input type="date" class="form-control" id="userbaptism" >       
+                </div>
+                <div class="mb-3">
+                    <label for="usercatechism" class="sr-only" >Date of Catechism</label>
+                    <input type="date" class="form-control" id="usercatechism" >       
+                </div>
+                <div class="mb-3">
+                    <select class="form-select" id="userdistrict">
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <div class="p-3" id="usergroups">
+                        
+                    </div>
+                </div>
+                <div class="d-flex justify-content-evenly mb-3">
+                    <button type="button" class="btn btn-warning" id="btn-update">Update</button>
+                    <button type="button" class="btn btn-danger" id="btn-delete">Delete</button>
+                </div>
+                                                  
+            </form>
+            <div id="errorDiv" class="d-flex justify-content-center alert mx-auto" role="alert" style="width: 50%;"> </div>
+            <script>
+                    const statusNode1= document.getElementById("errorDiv")
+                    const observer1 = new MutationObserver((mutationsList)=>{
+                        mutationsList.forEach(function(mutation) {
+                            setTimeout(()=>{
+                                statusNode.classList.remove("alert-danger","alert-success","alert-warning")
+                                statusNode.innerHTML=""
+                            },10000)
+                        })
+                    })
+                    observer1.observe(statusNode1,{cattributes:true,childList:true,characterData:true})
+            </script>
+        </div> 
+    </div>
+</div>
+
+<script>
+    var selectedMember=""
+    var members=[] 
+    var districts=[]  
+    var groups=[]  
+     //Initial function called once a page is loaded
+    window.onload=function () {
+        loadcompleted() 
+        var status =document.getElementById("errorDiv")              
+        fetch('https://localhost:8080/district',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+               districts=data
+                
+            }).catch((e)=>{               
+        }) 
+        fetch('https://localhost:8080/group',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                groups=data
+                
+            }).catch((e)=>{               
+        }) 
+        fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                members=data
+                document.getElementById("numberofmembers").innerHTML=members.length 
+                loaddata(members)
+                status.classList.add("alert-success")
+                status.innerHTML="Fetching member data completed"
+                loadata(loggedin)
+            }).catch((e)=>{
+                status.classList.add("alert-warning")
+                status.innerHTML="Something went wrong"                
+        }) 
+        
+    }; 
+
+    function loadata(data){
+        if (districts!='undefined' && districts){ 
+           form.userdistrict.innerHTML=""
+            districts.forEach((element)=>{
+                let option = document.createElement("option");
+                option.value = element.Id;
+                option.text = element.Name;
+                form.userdistrict.add(option);
+            })
+        }
+        if (groups!='undefined' && groups){
+            var field=document.getElementById("usergroups")
+            field.innerHTML=""
+            groups.forEach((element)=>{
+                const box=document.createElement("div")
+                box.classList.add("form-check","form-switch")
+                const input=document.createElement("input")
+                input.classList.add("form-check-input")
+                input.setAttribute("type","checkbox")
+                input.setAttribute("value",element.Id)
+                input.setAttribute("id","g_"+element.Id)
+                const label=document.createElement("label")
+                label.classList.add("form-check-label")
+                label.setAttribute("for","g_"+element.Id)
+                label.textContent=element.Name
+                box.appendChild(label)
+                box.appendChild(input)
+                field.appendChild(box)
+            })
+        }
+        if (data!='undefined' && data){           
+            const found=members.find((element)=> element.Email==data) 
+            form.username.value=found.Name
+            form.useremail.value=found.Email
+            form.usercontact.value=found.Contacts
+            form.userbirth.value=found.DateofBirth
+            form.userbaptism.value=found.DateofBaptism
+            form.usercatechism.value=found.DateofCatechism
+            form.userdistrict.value=found.District
+            selectedMember=found.Id
+
+            if (found.Groups!==null && found.Groups.length!==0){
+                var result=new Array()
+                if (found.Groups.includes(';')){
+                    result= found.Groups.split(';')
+                }
+                else{
+                    result.push(found.Groups)
+                }
+                if (Array.isArray(result)){
+                    result.forEach((element)=>{
+                        var checkbox=document.getElementById("g_"+element)
+                        if (checkbox){
+                            checkbox.checked=true}
+                    })
+                }                    
+            }
+        }
+    }
+    document.getElementById("btn-delete").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+            var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Id":selectedMember})
+            fetch('https://localhost:8080/member',{ method:'DELETE',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+            (data)=>{
+                if(data.hasOwnProperty('Error')){
+                    y.classList.add("alert-warning")
+                    y.innerHTML=data['Error']
+                    form.classList.remove('was-validated')
+                }else{
+                    y.classList.add("alert-success")
+                    y.innerHTML="Member deleted"                          
+                }
+            }).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+            })            
+        }
+
+    })
+    document.getElementById("btn-update").addEventListener("click",function(event){
+        event.preventDefault()
+        event.stopPropagation()
+        if (form.checkValidity()){
+            var y=document.getElementById('errorDiv')
+                var data=JSON.stringify({"Name":form.username.value,"Email":form.useremail.value,"Contacts":form.usercontact.value,"DateofBirth":form.userbirth.value,"DateofBaptism":form.userbaptism.value,"DateofCatechism":form.usercatechism.value,"District":form.userdistrict.value,
+                    "Groups":getgroups(),"Id":selectedMember
+                })
+                fetch('https://localhost:8080/member',{ method:'PUT',headers:{'Content-Type':'application/json','Accept':'application/json'},body: data,credentials:"include"}).then(
+                    (result)=>{                    
+                        if (!result.ok){                    
+                            throw new Error(JSON.stringify(result.body));
+                        }
+                        return result.json();
+                    }
+                ).then(
+                    (data)=>{    
+                        if(data.hasOwnProperty('Error')){
+                            y.classList.add("alert-warning")
+                            y.innerHTML=data['Error']
+                            form.classList.remove('was-validated')
+                        }else{
+                            y.classList.add("alert-success")
+                            y.innerHTML="Member data updated"                          
+                        }
+                    }
+                ).catch((e)=>{
+                    y.classList.add("alert-danger")
+                    y.innerHTML=="Something went wrong"
+                    form.classList.remove('was-validated')
+                })   
+        }
+
+    })
+
+</script>
+
+{{template "footer"}} 

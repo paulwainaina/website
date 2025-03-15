@@ -31,6 +31,7 @@ type Member struct {
 	Password        string `bson:"Password"`
 	Active          bool   `bson:"Active"`
 	Role            int    `bson:"Role"`
+	Gender          string `bson:"Gender"`
 }
 
 type Members struct {

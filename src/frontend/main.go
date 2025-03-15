@@ -51,8 +51,8 @@ func ServicesHandler(w http.ResponseWriter, r *http.Request) {
 	RenderTemplate(w, "services.html", &Page{Title: "Services", Data: nil})
 }
 
-func EventsHandler(w http.ResponseWriter, r *http.Request) {
-	RenderTemplate(w, "events.html", &Page{Title: "Events", Data: nil})
+func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+	RenderTemplate(w, "profile.html", &Page{Title: "Profile", Data: nil})
 }
 
 func ContactsHandler(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +96,7 @@ func main() {
 	router := http.NewServeMux()
 	router.HandleFunc("/home", IndexHandler)
 	router.Handle("/services", middleware(http.HandlerFunc(ServicesHandler)))
-	router.HandleFunc("/events", EventsHandler)
+	router.HandleFunc("/profile", ProfileHandler)
 	router.HandleFunc("/contacts", ContactsHandler)
 	router.HandleFunc("/login", LoginHandler)
 	router.HandleFunc("/signup", SignupHandler)
