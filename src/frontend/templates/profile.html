@@ -57,8 +57,8 @@
                     const observer1 = new MutationObserver((mutationsList)=>{
                         mutationsList.forEach(function(mutation) {
                             setTimeout(()=>{
-                                statusNode.classList.remove("alert-danger","alert-success","alert-warning")
-                                statusNode.innerHTML=""
+                                statusNode1.classList.remove("alert-danger","alert-success","alert-warning")
+                                statusNode1.innerHTML=""
                             },10000)
                         })
                     })
@@ -72,53 +72,10 @@
     var selectedMember=""
     var members=[] 
     var districts=[]  
-    var groups=[]  
-     //Initial function called once a page is loaded
-    window.onload=function () {
-        loadcompleted() 
-        var status =document.getElementById("errorDiv")              
-        fetch('https://localhost:8080/district',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
-            (result)=>{                    
-                if (!result.ok){                    
-                    throw new Error(JSON.stringify(result.body));
-                }
-                return result.json();
-            }).then((data)=>{
-               districts=data
-                
-            }).catch((e)=>{               
-        }) 
-        fetch('https://localhost:8080/group',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
-            (result)=>{                    
-                if (!result.ok){                    
-                    throw new Error(JSON.stringify(result.body));
-                }
-                return result.json();
-            }).then((data)=>{
-                groups=data
-                
-            }).catch((e)=>{               
-        }) 
-        fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
-            (result)=>{                    
-                if (!result.ok){                    
-                    throw new Error(JSON.stringify(result.body));
-                }
-                return result.json();
-            }).then((data)=>{
-                members=data
-                document.getElementById("numberofmembers").innerHTML=members.length 
-                loaddata(members)
-                status.classList.add("alert-success")
-                status.innerHTML="Fetching member data completed"
-                loadata(loggedin)
-            }).catch((e)=>{
-                status.classList.add("alert-warning")
-                status.innerHTML="Something went wrong"                
-        }) 
-        
-    }; 
+    var groups=[] 
 
+    var form=document.getElementById("registerform")
+    
     function loadata(data){
         if (districts!='undefined' && districts){ 
            form.userdistrict.innerHTML=""
@@ -177,7 +134,52 @@
                 }                    
             }
         }
-    }
+    }  
+     //Initial function called once a page is loaded
+    window.onload=function () {
+        loadcompleted() 
+        var status =document.getElementById("errorDiv")              
+        fetch('https://localhost:8080/district',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+               districts=data
+                
+            }).catch((e)=>{               
+        }) 
+        fetch('https://localhost:8080/group',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                groups=data
+                
+            }).catch((e)=>{               
+        }) 
+        fetch('https://localhost:8080/member',{ method:'GET',headers:{'Content-Type':'application/json','Accept':'application/json'},credentials:"include"}).then(
+            (result)=>{                    
+                if (!result.ok){                    
+                    throw new Error(JSON.stringify(result.body));
+                }
+                return result.json();
+            }).then((data)=>{
+                members=data
+                status.classList.add("alert-success")
+                status.innerHTML="Fetching member data completed"
+                loadata(loggedin)
+            }).catch((e)=>{
+                status.classList.add("alert-warning")
+                status.innerHTML="Something went wrong"                
+        }) 
+        
+    }; 
+
+   
     document.getElementById("btn-delete").addEventListener("click",function(event){
         event.preventDefault()
         event.stopPropagation()

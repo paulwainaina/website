@@ -61,7 +61,7 @@
                         }
                         return result.json();
                     }).then((data)=>{
-                        if(data['active']){
+                        if(data.active){
                             document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
                                 link.removeAttribute('aria-disabled')
                                 link.classList.remove('disabled');
@@ -76,7 +76,7 @@
                                 document.getElementById("logoutsession").style.display='none'
                             })
                         }
-                        if (data['useremail'] && data['useremail']!==""){
+                        if (data.useremail !==null && data.useremail!==""){
                         var profile=document.getElementById('profile')
                         profile.removeAttribute('arial-disabled')
                         profile.classList.remove('disabled')
