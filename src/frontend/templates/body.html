@@ -61,26 +61,23 @@
                         }
                         return result.json();
                     }).then((data)=>{
-                        if(data.active){
+                        var d =JSON.parse(data)
+                        if(d.active){
                             document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
                                 link.removeAttribute('aria-disabled')
-                                link.classList.remove('disabled');
-                                document.getElementById("openloginpage").style.display='none'
-                                document.getElementById("logoutsession").style.display='block'
+                                link.classList.remove('disabled');                                
                             })
                         }else{
                             document.querySelectorAll('.nav-link.sensitive').forEach(function(link) {
                                 link.setAttribute('aria-disabled', 'true')
                                 link.classList.add('disabled');
-                                document.getElementById("openloginpage").style.display='block'
-                                document.getElementById("logoutsession").style.display='none'
                             })
-                        }
-                        if (data.useremail !==null && data.useremail!==""){
+                        }                       
+                        if (d.useremail !==null && d.useremail!==""){
                         var profile=document.getElementById('profile')
                         profile.removeAttribute('arial-disabled')
                         profile.classList.remove('disabled')
-                        loggedin=data['useremail']}
+                        loggedin=d.useremail}
                     }).catch((e)=>{
                         //window.location.replace("https://localhost:4443/");
                     })
@@ -114,8 +111,14 @@
                     activeItem.parentElement.style.backgroundColor="grey";
                 }
                 //if session does not exist deactivate some pages
-                SessionExists()              
-
+                
+                if(SessionExists()) {
+                    document.getElementById("openloginpage").style.display='none'
+                    document.getElementById("logoutsession").style.display='block'
+                }else{
+                    document.getElementById("openloginpage").style.display='block'
+                    document.getElementById("logoutsession").style.display='none'
+                }  
             }                                  
         </script>
         <style>

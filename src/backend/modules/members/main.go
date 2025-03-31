@@ -219,9 +219,7 @@ func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			{
 				result := make([]Member, 0)
 				for _, m := range members.members {
-					if m.Role != 1 {
-						result = append(result, *m)
-					}
+					result = append(result, *m)
 				}
 				json.NewEncoder(w).Encode(result)
 				return
