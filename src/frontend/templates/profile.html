@@ -2,7 +2,7 @@
     <title>{{.Title}}</title>
 {{template "body"}} 
 <div class="container d-flex justify-content-center align-items-center" > 
-    <div class="card">
+    <div class="card" style="width:50rem;margin:auto;">
         <div class="card-body">
             <h5 class="card-title">Member Management</h5>
             <form class="needs-validation" id="registerform" novalidate style="margin:0 auto;">
@@ -204,6 +204,20 @@
         }
 
     })
+    function getgroups(){
+        var checkboxes=document.querySelectorAll('.form-check-input')
+        var result=""
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                if (result!==""){
+                    result+=";"
+                }
+                result+=checkbox.value
+            }
+            console.log(result)
+        });
+        return result
+    }
     document.getElementById("btn-update").addEventListener("click",function(event){
         event.preventDefault()
         event.stopPropagation()
