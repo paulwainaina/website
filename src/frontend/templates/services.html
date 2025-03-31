@@ -1,16 +1,25 @@
 {{template "header"}}
 <title>{{.Title}}</title>
-<style>
-    body {
-        background-image: url('../assets/favicon.jpg');
-        background-size: cover;
-        background-repeat: no-repeat; 
-        background-attachment: fixed; 
+<style>    
+    h2 {
+        color: yellow;
+        font-weight: bold;
     }
+    .card {
+        border: 2px solid #007bff; 
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: scale(1.05); 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+    }
+
 </style>
 {{template "body"}} 
 <div class="container d-flex justify-content-center align-items-center" >   
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-5 mb-5">
+<div class="row row-cols-1 row-cols-md-3 g-4 mt-5 mb-5 mb-4">
+
         <div class="col">
             <div class="card" >
                 <img src="https://localhost:4443/assets/logo.jpg" class="card-img-top p-3" alt="Company Logo">
@@ -55,44 +64,46 @@
 </div>
 
 <div class="container mt-5">
-    <h2 class="text-center">Gallery</h2>
-    <div class="row no-gutters">
+<h2 class="text-center">Gallery</h2>
+
+    <div class="row no-gutters mb-4">
+
         <div class="col-md-4">
-            <div class="card">
-                <img src="../assets/GATE.jpg" class="card-img-top" alt="Image 1">
-                <div class="card-body">
+            <div class="card text-bg-dark">
+                <img src="../assets/GATE.jpg" class="card-img" alt="Image 1">
+                <div class="card-img-overlay">
                     <h5 class="card-title">Church Gate</h5>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card">
-                <img src="../assets/FRONT SIDE.jpg" class="card-img-top" alt="Image 2">
-                <div class="card-body">
+            <div class="card text-bg-dark">
+                <img src="../assets/FRONT SIDE.jpg" class="card-img" alt="Image 2">
+                <div class="card-img-overlay">
                     <h5 class="card-title">Church Front Side</h5>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card">
-                <img src="../assets/LANDSCAPE.jpg" class="card-img-top" alt="Image 3">
-                <div class="card-body">
+            <div class="card text-bg-dark">
+                <img src="../assets/LANDSCAPE.jpg" class="card-img" alt="Image 3">
+                <div class="card-img-overlay">
                     <h5 class="card-title">Church Landscape</h5>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card">
-                <img src="../assets/FESTRY.jpg" class="card-img-top" alt="Image 4">
-                <div class="card-body">
+            <div class="card text-bg-dark">
+                <img src="../assets/FESTRY.jpg" class="card-img" alt="Image 4">
+                <div class="card-img-overlay">
                     <h5 class="card-title">Festry, Youth Resource Center, & Kahunira Jitegemea Sacco</h5>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card">
-                <img src="../assets/SUNDAY SCHOOL.jpg" class="card-img-top" alt="Image 5">
-                <div class="card-body">
+            <div class="card text-bg-dark">
+                <img src="../assets/SUNDAY SCHOOL.jpg" class="card-img" alt="Image 5">
+                <div class="card-img-overlay">
                     <h5 class="card-title">Church Sunday School</h5>
                 </div>
             </div>
@@ -100,14 +111,11 @@
     </div>
 </div>
 
-
-
 <script>
     //Initial function called once a page is loaded
     window.onload=function () {
        loadcompleted()             
    }; 
 </script>
-
 
 {{template "footer"}}

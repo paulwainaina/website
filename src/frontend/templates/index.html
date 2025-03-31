@@ -1,19 +1,19 @@
 {{template "header"}}
 <title>{{.Title}}</title>
-{{template "body"}}  
-<script>
+<style>
     .carousel-inner {
-    height: 500px; /* You can adjust this height as needed */
-    overflow: hidden; /* Hide anything that overflows the container */
+        height: 500px; /* You can adjust this height as needed */
+        overflow: hidden; /* Hide anything that overflows the container */
     }
 
     /* Ensure images fill the entire carousel item without stretching */
     .carousel-inner img {
-    object-fit: cover; /* This makes sure images cover the area without stretching */
-    width: 100%; /* Ensure the images fill the width of the container */
-    height: 100%; /* Ensure the images fill the height of the container */
+        object-fit: cover; /* This makes sure images cover the area without stretching */
+        width: 100%; /* Ensure the images fill the width of the container */
+        height: 100%; /* Ensure the images fill the height of the container */
     }
-</script>
+</style>
+{{template "body"}}  
 <div class="container d-flex flex-column">
     <div class="container mt-3">
         <div id="carouselExampleFade" class="carousel slide" data-bs-ride="carousel">

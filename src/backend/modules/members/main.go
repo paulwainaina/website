@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
 
+	"github.com/astaxie/beego/session"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Member struct {
@@ -25,16 +28,21 @@ type Member struct {
 	District        string `bson:"District"`
 	Groups          string `bson:"Groups"`
 	Passport        string `bson:"Passport"`
+	Password        string `bson:"Password"`
+	Active          bool   `bson:"Active"`
+	Role            int    `bson:"Role"`
+	Gender          string `bson:"Gender"`
 }
 
 type Members struct {
-	members []*Member
-	db      *mongo.Database
+	members        []*Member
+	db             *mongo.Database
+	globalSessions *session.Manager
 }
 
 const memberCollection = "member"
 
-func NewMembers(db *mongo.Database) *Members {
+func NewMembers(db *mongo.Database, globalSessions *session.Manager) *Members {
 	members := make([]*Member, 0)
 	col := db.Collection(memberCollection)
 	result, err := col.Find(context.TODO(), bson.M{})
@@ -45,15 +53,46 @@ func NewMembers(db *mongo.Database) *Members {
 			log.Fatal("error loading members data " + err.Error())
 		}
 	}
-	return &Members{members: members, db: db}
+	return &Members{members: members, db: db, globalSessions: globalSessions}
 }
 
-func (members *Members) add(newmember *Member) (*Member, error) {
+func (members *Members) login(username, userpassword string) (*Member, error) {
+	for _, user := range members.members {
+		if strings.EqualFold(username, user.Name) || strings.EqualFold(username, user.Email) {
+			err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userpassword))
+			if err != nil {
+				return nil, fmt.Errorf("wrong password provided")
+			}
+			return user, nil
+		}
+	}
+	return nil, fmt.Errorf("account does not exist")
+}
+
+func (members *Members) SuperUser(useremail string) bool {
+	canedit := false
+	for _, user := range members.members {
+		if strings.EqualFold(useremail, user.Email) {
+			if user.Active {
+				canedit = true
+			}
+			break
+		}
+	}
+	return canedit
+}
+
+func (members *Members) Add(newmember *Member) (*Member, error) {
 	for _, member := range members.members {
 		if strings.EqualFold(member.Email, newmember.Email) {
 			return nil, fmt.Errorf("member already exists")
 		}
 	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(newmember.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("error processing user password")
+	}
+	newmember.Password = string(hash)
 	bsonData, err := bson.Marshal(newmember)
 	if err != nil {
 		return nil, fmt.Errorf("error processing member details")
@@ -99,7 +138,7 @@ func (members *Members) update(update map[string]interface{}) (*Member, error) {
 			if field.Type() == val.Type() {
 				field.Set(val)
 			} else {
-				return nil, fmt.Errorf("Type mismatch for field %s", key)
+				return nil, fmt.Errorf("type mismatch for field %s", key)
 			}
 		}
 	}
@@ -124,7 +163,40 @@ func (members *Members) update(update map[string]interface{}) (*Member, error) {
 }
 
 func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.EqualFold(r.URL.Path, "/member") {
+	if strings.EqualFold(r.URL.Path, "/login") {
+		var credentials struct {
+			NameEmail string
+			Password  string
+		}
+		err := json.NewDecoder(r.Body).Decode(&credentials)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		user, err := members.login(credentials.NameEmail, credentials.Password)
+		if err != nil {
+			res := struct{ Error string }{Error: err.Error()}
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+		if user.Role == 1 && !user.Active {
+			res := struct{ Error string }{Error: fmt.Errorf("contact the system administrator to activate account").Error()}
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+		sess, err := members.globalSessions.SessionStart(w, r)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		defer sess.SessionRelease(w)
+		sess.Set("useremail", user.Email)
+		http.SetCookie(w, &http.Cookie{Name: os.Getenv("Session_Cookie"), Value: sess.SessionID(), Path: "/", HttpOnly: false, Secure: true})
+		json.NewEncoder(w).Encode(user)
+		return
+	} else if strings.EqualFold(r.URL.Path, "/logout") {
+		members.globalSessions.SessionDestroy(w, r)
+	} else if strings.EqualFold(r.URL.Path, "/member") {
 		switch r.Method {
 		case http.MethodPost:
 			{
@@ -135,7 +207,7 @@ func (members *Members) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				newmember.Id = uuid.NewString()
-				u, err := members.add(&newmember)
+				u, err := members.Add(&newmember)
 				if err != nil {
 					json.NewEncoder(w).Encode(fmt.Sprintf("{error: %s}", err.Error()))
 					return
